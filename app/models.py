@@ -11,13 +11,18 @@ class Utilizador(models.Model):
 	nome = models.CharField('nome',max_length=80,null=False,blank=False)
 	data_nascimento = models.DateField(u'data nascimento',null=False)
 	data_join = models.DateTimeField(u'data join',auto_now_add=True,null=False)
+	data_left = models.DateTimeField(u'data left',null=True)
 	activa = models.BooleanField('activo',default=True)
 	amigos = models.ManyToManyField('Utilizador',related_name='mamigos')
-
+	
+	
+	
 class Retalhista(models.Model):
 	username = models.CharField('username',max_length=80,null=False,blank=False,unique=True)
 	password = models.CharField('password',max_length=80,null=False,blank=False)
 	email = models.EmailField('email',null=False,blank=False,unique=True)
+	url = models.URLField('link',max_length=400,null=True)
+	nome = models.CharField('nome',max_length=80,null=False,blank=False)
 	data_join = models.DateTimeField(u'data join',auto_now_add=True,null=False)
 	
 
