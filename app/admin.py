@@ -1,11 +1,26 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 from models import Utilizador,Retalhista,Produto,Campanha
-from models import Grupo,GrupoUtilizadores,WishList,WishListProdutos
+from models import Grupo,GrupoUtilizadores,WishList
+from models import WishListProdutos,UtilizadoresGrupos
 
 class UtilizadorAdmin(admin.ModelAdmin):
     pass
 admin.site.register(Utilizador, UtilizadorAdmin)
+
+"""
+class GrupoUtilizadoresInline(admin.TabularInline):
+	model = GrupoUtilizadores
+"""
+class UtilizadoresGruposAdmin(admin.ModelAdmin):
+	pass
+	"""
+    inlines = [
+    	UtilizadoresGruposInline
+    ]
+    """
+admin.site.register(UtilizadoresGrupos, UtilizadoresGruposAdmin)
+
 
 
 class RetalhistaAdmin(admin.ModelAdmin):
