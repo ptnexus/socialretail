@@ -11,10 +11,14 @@ class Utilizador(models.Model):
 	nome = models.CharField('nome',max_length=80,null=False,blank=False)
 	data_nascimento = models.DateField(u'data nascimento',null=False)
 	data_join = models.DateTimeField(u'data join',auto_now_add=True,null=False)
-	data_left = models.DateTimeField(u'data left',null=True)
+	data_left = models.DateTimeField(u'data left',null=True,blank=True)
 	activa = models.BooleanField('activo',default=True)
-	amigos = models.ManyToManyField('Utilizador',related_name='mamigos')
-	foto = models.URLField('foto',null=True)
+	amigos = models.ManyToManyField('Utilizador',related_name='mamigos',blank=True)
+	foto = models.URLField('foto',null=True,blank=True)
+	def __unicode__(self):
+		return self.nome + "::" + self.email
+	def getTable(self):
+		return "<tr><td>"+self.nome+"</td><td>"+self.email+"</td></tr>"
 	
 class UtilizadoresGrupos(models.Model):
 	utilizador = models.ForeignKey(Utilizador,null=False)

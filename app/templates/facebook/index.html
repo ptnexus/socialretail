@@ -1,0 +1,5 @@
+{% for user in object %}
+<table border="1">
+{{ user.getTable|removetags:"<td>"|safe }}
+</table>
+{% endfor %}
