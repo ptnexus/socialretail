@@ -3,24 +3,22 @@
 
 {% block content %}
 	<h3>Friends Groups List</h3>
-	<form class="well form-search">
-	  <input type="text" class="input-medium search-query">
+	<form class="well form-search" method="post">
+	  {% csrf_token %}
+	  <input type="text" name="search" class="input-medium search-query" value="{{ search }}">
 	  <button type="submit" class="btn">Search</button>
 	</form>
+	{% if groups|length > 0 %}
 	<table class="table table-striped">
 		<thead>
 			<th>Name</th>
 		</thead>
 		<tbody>
+			{% for group in groups %}
 			<tr>
-				<td>dfgh</td>
+				<td>{{ group.nome }}</td>
 			</tr>
-			<tr>
-				<td>dfgh</td>
-			</tr>
-			<tr>
-				<td>dfgh</td>
-			</tr>
+			{% endfor %}
 		</tbody>
 		<tfoot>
 			<tr>
@@ -42,4 +40,7 @@
 			</tr>
 		</tfoot>
 	</table>
+	{% else %}
+		No Groups
+	{% endif %}
 {% endblock %}

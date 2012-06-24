@@ -7,19 +7,28 @@
 {% block content %}
 	<h3>Login</h3>
 	<div class="well">
-	<p>
-		Make Login
-	</p>
+		<p>
+			Make Login
+		</p>
 	</div>
-	<form class="well form-inline" style="width:auto;">
-	  <input type="text" class="input-medium" placeholder="Email">
-	  <input type="password" class="input-small" placeholder="Password">
-	  <label class="checkbox">
-	    <input type="checkbox"> Remember me
-	  </label>
-	  <button type="submit" class="btn">Sign in</button>
+	<form class="well form-inline" method="post" style="width:auto;">
+		{% csrf_token %}
+		{% for field in form %}
+			{% if field.name != "remember" %}
+				{{ field }}
+			{% else %}
+				<label class="checkbox">
+					{{ field }} Remember me
+				</label>
+			{% endif %}
+		{% endfor %}
+		<button type="submit" class="btn">Sign in</button>
+		<div>
+		{{ form.errors }}
+		</div>
+		
+		{{ message }}
 	</form>
-	
 	<div class="form-actions">
 		<button type="submit" class="btn btn-primary">Recover Password</button>
 	</div>

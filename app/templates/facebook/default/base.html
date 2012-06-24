@@ -7,9 +7,21 @@
     <link type="text/css" href="{{ STATIC_URL }}css/flick/jquery-ui-1.8.21.custom.css" rel="stylesheet" />
     <link type="text/css" href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet" />
     <link type="text/css" href="{{ STATIC_URL }}css/bootstrap-responsive.min.css" rel="stylesheet" />
+    <link type="text/css" href="{{ STATIC_URL }}css/ui.multiselect.css" rel="stylesheet" />
 	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.7.2.min.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.8.21.custom.min.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
+    
+	<script type="text/javascript" src="{{ STATIC_URL }}js/plugins/localisation/jquery.localisation-min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/plugins/scrollTo/jquery.scrollTo-min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/ui.multiselect.js"></script>
+	<script type="text/javascript">
+		$(function(){
+			$.localise('ui-multiselect', {/*language: 'en',*/ path: 'js/locale/'});
+			$(".multiselect").multiselect();
+		});
+	</script>
+    
     <style>
     	.mycontainer {
 			box-shadow: 0px 0px 10px #eaeaea;
@@ -45,7 +57,9 @@
 		    	
 		    	<div style="position:absolute; right:10px; top:5px;">
 		    	{% block top_options %}
-		    		Logout <i class="icon-off"></i>
+		    		<div onclick="window.location='{% url logout-view %}';" style="cursor:pointer;">
+		    			Logout <i class="icon-off"></i>
+		    		</div>
 		    	{% endblock top_options %}
 		    	</div>
 		    </div>
@@ -69,9 +83,6 @@
 		    </div>
 		  </div>
 		</div>
-		
-    	
   	</div>
-
 </body>
 </html>

@@ -16,7 +16,7 @@ class Utilizador(models.Model):
 	amigos = models.ManyToManyField('Utilizador',related_name='mamigos',blank=True)
 	foto = models.URLField('foto',null=True,blank=True)
 	def __unicode__(self):
-		return self.nome + "::" + self.email
+		return self.nome
 	def getTable(self):
 		return "<tr><td>"+self.nome+"</td><td>"+self.email+"</td></tr>"
 	
@@ -25,6 +25,8 @@ class UtilizadoresGrupos(models.Model):
 	nome = models.CharField('nome',max_length=80,null=False,blank=False)
 	data_create = models.DateTimeField(u'data criação',auto_now_add=True,null=False)
 	amigos_grupo = models.ManyToManyField('Utilizador',related_name='gpamigos')
+	class Meta:
+		unique_together = ( ('utilizador','nome'),)
 	
 class Retalhista(models.Model):
 	username = models.CharField('username',max_length=80,null=False,blank=False,unique=True)
