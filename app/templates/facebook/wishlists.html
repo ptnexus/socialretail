@@ -10,11 +10,20 @@
 	</form>
 	<table class="table table-striped">
 		<thead>
+			<th width="1%"></th>
 			<th>Name</th>
 		</thead>
 		<tbody>
 			{% for wishlist in page.object_list %}
 			<tr>
+				<td nowrap="nowrap">
+					<i onclick="window.location='{% url wishlist-edit pk=wishlist.pk %}';" 
+						class="icon-edit" style="cursor:pointer;" title="Edit">
+					</i>
+					<i onclick="if(confirm('Realy remove wishlist {{ wishlist.name }}?')) window.location='{% url wishlist-remove pk=wishlist.pk %}';" 
+						class="icon-remove" style="cursor:pointer;" title="Remove" >
+					</i>
+				</td>
 				<td>
 					{{ wishlist.name }}
  				</td>

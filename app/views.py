@@ -13,9 +13,16 @@ from django.forms.util import ErrorList
 
 @access_required
 def home(request,*kwargs):
-	return render(request, 'facebook/index.html', {},)
+	return render(request, 'facebook/home.html', {},)
 	#return HttpResponse(json.dumps(map(lambda x:{'name':x.nome,'email':x.email},Utilizador.objects.all())), mimetype="application/json")
-	
+
+def about_us(request,*kwargs):
+	hasLogin = Login(request).hasLogin()
+	return render(request, 'facebook/about_us.html', {
+		'template': 'facebook/default/base.html' if hasLogin else 'login.html',
+		'hasLogin':hasLogin,
+	},)
+
 def loaddata(request,*kwargs):
 	u,c = CustomUser.objects.get_or_create(username = 'bruno',password = '123456',
 		email = 'ssbv96@gmail.com',name = 'Bruno Sousa',

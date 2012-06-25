@@ -10,21 +10,30 @@
 	</form>
 	<table class="table table-striped">
 		<thead>
-			<th>Photo</th>
+			<th>Logo</th>
 			<th>Name</th>
+			<th>Retailer Page</th>
 		</thead>
 		<tbody>
 			{% for retailer in page.object_list %}
-			<tr>
-				<td>dfgh</td>
+			<tr style="cursor:pointer;" onclick="window.location='{% url retailer-detail pk=retailer.pk %}';">
+				<td>
+					<img src="{{ retailer.photo }}" width="80px" />
+				</td>
 				<td>{{ retailer.name }}</td>
+				<td>
+					{% if retailer.url %}
+						<a href="{{ retailer.url }}" target="_blank">Link</a>
+					{% else %}
+					N/A
+					{% endif %}
+				</td>
 			</tr>
 			{% endfor %}
 		</tbody>
 		<tfoot>
 			<tr>
-				<td colspan="2">
-					
+				<td colspan="3">
 					<div class="pagination">
 					  <ul>
 					    {% if page.has_previous %}

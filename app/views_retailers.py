@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from models import CustomUser,Retailer
 import json
 from django.db.models import Q
@@ -33,4 +33,17 @@ def list(request,*kwargs):
 		'page': paginator.page(page),	
 		'page_number':page,
 	},)
-
+	
+@access_required
+def detail(request,pk,*kwargs):	
+	try:
+		object = Retailer.objects.get(pk=pk)
+	except Exception,e:
+		return redirect('retailers-list')
+	print dir(object)
+	user = Login(request).getUser()
+	promotions =  object.promotion_set.all()
+	return render(request, 'facebook/retailer_detail.html', {
+		'object': object,
+		'promotions':map(lambda x: x.getPromotionInfo(user), promotions),
+	},)

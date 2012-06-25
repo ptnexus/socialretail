@@ -19,13 +19,24 @@
 		</thead>
 		<tbody>
 			{% for promotion in page.object_list %}
-			<tr>
-				<td>dfgh</td>
-				<td>{{ promotion.product.name }}</td>
-				<td>dfgh</td>
-				<td>dfgh</td>
-				<td>dfgh</td>
-			</tr>
+				{% with product=promotion.product %}
+				<tr>
+					<td>
+						<img src="{{ product.photo }}" width="80px" />
+					
+					</td>
+					<td>
+						<a href="{% url product-detail pk=product.pk %}#promotions">{{ product.name }}</a>
+					</td>
+					<td>{{ promotion.formattedprice }}</td>
+					<td>{{ promotion.elements_number}}</td>
+					<td>
+						<a href="{% url retailer-detail pk=promotion.retailer.pk %}" >
+							{{ promotion.retailer.name }}
+						</a>
+					</td>
+				</tr>
+				{% endwith %}
 			{% endfor %}
 			
 		</tbody>

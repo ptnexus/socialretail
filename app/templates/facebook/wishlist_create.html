@@ -1,0 +1,40 @@
+{% extends "facebook/default/base.html" %}
+
+
+{% block content %}
+	<style>
+		.form-horizontal .control-label {
+			width:80px;
+		}
+		.form-horizontal .controls {
+			margin-left:100px;
+		}
+	</style>
+	<h3>{% block fiends_title %}Wishlist Create{% endblock %}</h3>
+	<form class="well form-horizontal" method="post" style="width:auto;">
+		{{ form.errors }}
+		{% csrf_token %}
+		<fieldset>
+		{% for field in form %}
+			{% if field.name == "utilizador" %}
+			{% else %}
+			<div class="control-group">
+	            <label class="control-label" for="input01">{{ field.label }}</label>
+	            <div class="controls">
+	              {{ field }}
+	              {% if field.errors %}
+	              	<p class="help-block">{{ field.errors }}</p>
+	              {% endif %}
+	            </div>
+	        </div>
+			{% endif %}
+		{% endfor %}
+			<div class="form-actions">
+				{% block friends_options %}
+	            <button type="submit" class="btn btn-primary">Create</button>
+	            {% endblock %}
+	            <button class="btn">Cancel</button>
+	        </div>
+		</fieldset>
+	</form>
+{% endblock %}

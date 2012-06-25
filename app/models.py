@@ -66,7 +66,8 @@ class Product(models.Model):
 	photo = models.URLField('photo',null=True,blank=True)
 	def formattedprice(self):
 		return "€%01.2f" % self.price
-	
+	def __unicode__(self):
+		return self.name
 	
 	
 class Promotion(models.Model):
@@ -84,7 +85,7 @@ class Promotion(models.Model):
 		return "€%01.2f" % self.price
 	def userInPromotion(self,myuser):
 		for p in PromotionGroup.objects.filter(promotion=self,active=True).prefetch_related('users'):
-			if p.users.filter(user=myuser,left_date__exact=None).count() > 0:
+			if p.users.filter(user=myuser,).count() > 0:
 				return True
 		return False
 		
@@ -98,34 +99,23 @@ class PromotionGroup(models.Model):
 	promotion = models.ForeignKey(Promotion,null=False,related_name='promotion')
 	user = models.ForeignKey(CustomUser,null=False,related_name='user') 
 	create_date = models.DateTimeField(u'create date',auto_now_add=True,null=False)
-	users = models.ManyToManyField(CustomUser,through='UserGroupPromotion')
+	#users = models.ManyToManyField(CustomUser,through='UserGroupPromotion')
+	users = models.ManyToManyField(CustomUser,related_name='promotion_group_users')
 	active = models.BooleanField('active',default=True)
 	class Meta:
 		unique_together = ( ('user','promotion'),)
 
-class UserGroupPromotion(models.Model):
-	user = models.ForeignKey(CustomUser)
-	group = models.ForeignKey(PromotionGroup)
-	join_date = models.DateTimeField(u'join date',auto_now_add=True,null=False)
-	left_date = models.DateTimeField(u'left date',null=True,blank=True)
 	
 class WishList(models.Model):
 	user = models.ForeignKey(CustomUser,)
 	name = models.CharField('name',max_length=80,null=False,blank=False)
 	create_date = models.DateTimeField(u'create date',auto_now_add=True,null=False)
 	remove_date = models.DateTimeField(u'remove date',null=True,blank=True)
-	products = models.ManyToManyField(Product,through='WishListProduct')
+	#products = models.ManyToManyField(Product,through='WishListProduct', related_name='wishlist_product')
+	products = models.ManyToManyField(Product, related_name='wishlist_product')
 	class Meta:
 		unique_together = ( ('user','name'),)
 
-class WishListProduct(models.Model):
-	product = models.ForeignKey(Product,)
-	wishlist = models.ForeignKey(WishList,)
-	join_date = models.DateTimeField(u'join date',auto_now_add=True,null=False)
-	left_date = models.DateTimeField(u'left date',null=True,blank=True)
-	class Meta:
-		unique_together = ( ('product','wishlist'),)
-    
 	
 	
 	

@@ -42,3 +42,20 @@ class WishListProductForm(forms.ModelForm):
 	class Meta:
 		model = WishList
 		exclude = ('remove_date','user','products')
+		
+class WishListForm(forms.ModelForm):
+	def __init__(self, *args, **kwargs):
+	    super (WishListForm, self).__init__(*args, **kwargs)
+	    self.fields['products'].widget.attrs['class'] = "multiselect"
+	    self.fields['products'].widget.attrs['style'] = "width:440px;height:250px;"
+	    
+	def validate_unique(self):
+		exclude = self._get_validation_exclusions()
+		exclude.remove('user') # allow checking against the missing attribute
+		try:
+			self.instance.validate_unique(exclude=exclude)
+		except ValidationError, e:
+			self._update_errors(e.message_dict)
+	class Meta:
+		model = WishList
+		exclude = ('remove_date','user',)

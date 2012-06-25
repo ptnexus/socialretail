@@ -35,36 +35,15 @@ class PromotionAdmin(admin.ModelAdmin):
     pass
 admin.site.register(Promotion, PromotionAdmin)
 
-"""
-class GrupoUtilizadoresInline(admin.TabularInline):
-	model = GrupoUtilizadores
-
-class GrupoAdmin(admin.ModelAdmin):
-    inlines = [
-    	GrupoUtilizadoresInline
-    ]
-admin.site.register(Grupo, GrupoAdmin)
-"""
-
-class UserGroupPromotionInline(admin.TabularInline):
-	model = UserGroupPromotion
 
 class PromotionGroupAdmin(admin.ModelAdmin):
-	inlines = [
-    	UserGroupPromotionInline
-    ]
+	pass
 
 admin.site.register(PromotionGroup, PromotionGroupAdmin)
 
 
-
-class WishListProductInline(admin.TabularInline):
-    model = WishListProduct
-
 class WishListAdmin(admin.ModelAdmin):
-    inlines = [
-    	WishListProductInline
-    ]
+    pass
     
 admin.site.register(WishList, WishListAdmin)
 

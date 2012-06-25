@@ -74,6 +74,7 @@ class Migration(SchemaMigration):
             ('price', self.gf('django.db.models.fields.DecimalField')(max_digits=12, decimal_places=2)),
             ('description', self.gf('django.db.models.fields.TextField')()),
             ('create_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('photo', self.gf('django.db.models.fields.URLField')(max_length=200, null=True, blank=True)),
         ))
         db.send_create_signal('app', ['Product'])
 
@@ -81,7 +82,7 @@ class Migration(SchemaMigration):
         db.create_table('app_promotion', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('product', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['app.Product'])),
-            ('url', self.gf('django.db.models.fields.URLField')(max_length=400, null=True)),
+            ('url', self.gf('django.db.models.fields.URLField')(max_length=400, null=True, blank=True)),
             ('retailer', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['app.Retailer'])),
             ('price', self.gf('django.db.models.fields.DecimalField')(max_digits=12, decimal_places=2)),
             ('start_date', self.gf('django.db.models.fields.DateTimeField')(auto_now=True, blank=True)),
@@ -99,18 +100,20 @@ class Migration(SchemaMigration):
             ('promotion', self.gf('django.db.models.fields.related.ForeignKey')(related_name='promotion', to=orm['app.Promotion'])),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(related_name='user', to=orm['app.CustomUser'])),
             ('create_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
+            ('active', self.gf('django.db.models.fields.BooleanField')(default=True)),
         ))
         db.send_create_signal('app', ['PromotionGroup'])
 
-        # Adding model 'UserGroupPromotion'
-        db.create_table('app_usergrouppromotion', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['app.CustomUser'])),
-            ('group', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['app.PromotionGroup'])),
-            ('join_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('left_date', self.gf('django.db.models.fields.DateTimeField')(null=True)),
+        # Adding unique constraint on 'PromotionGroup', fields ['user', 'promotion']
+        db.create_unique('app_promotiongroup', ['user_id', 'promotion_id'])
+
+        # Adding M2M table for field users on 'PromotionGroup'
+        db.create_table('app_promotiongroup_users', (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('promotiongroup', models.ForeignKey(orm['app.promotiongroup'], null=False)),
+            ('customuser', models.ForeignKey(orm['app.customuser'], null=False))
         ))
-        db.send_create_signal('app', ['UserGroupPromotion'])
+        db.create_unique('app_promotiongroup_users', ['promotiongroup_id', 'customuser_id'])
 
         # Adding model 'WishList'
         db.create_table('app_wishlist', (
@@ -118,22 +121,29 @@ class Migration(SchemaMigration):
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['app.CustomUser'])),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=80)),
             ('create_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('remove_date', self.gf('django.db.models.fields.DateTimeField')(null=True)),
+            ('remove_date', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
         ))
         db.send_create_signal('app', ['WishList'])
 
-        # Adding model 'WishListProduct'
-        db.create_table('app_wishlistproduct', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('product', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['app.Product'])),
-            ('wishlist', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['app.WishList'])),
-            ('join_date', self.gf('django.db.models.fields.DateTimeField')(auto_now_add=True, blank=True)),
-            ('left_date', self.gf('django.db.models.fields.DateTimeField')(null=True)),
+        # Adding unique constraint on 'WishList', fields ['user', 'name']
+        db.create_unique('app_wishlist', ['user_id', 'name'])
+
+        # Adding M2M table for field products on 'WishList'
+        db.create_table('app_wishlist_products', (
+            ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
+            ('wishlist', models.ForeignKey(orm['app.wishlist'], null=False)),
+            ('product', models.ForeignKey(orm['app.product'], null=False))
         ))
-        db.send_create_signal('app', ['WishListProduct'])
+        db.create_unique('app_wishlist_products', ['wishlist_id', 'product_id'])
 
 
     def backwards(self, orm):
+        # Removing unique constraint on 'WishList', fields ['user', 'name']
+        db.delete_unique('app_wishlist', ['user_id', 'name'])
+
+        # Removing unique constraint on 'PromotionGroup', fields ['user', 'promotion']
+        db.delete_unique('app_promotiongroup', ['user_id', 'promotion_id'])
+
         # Removing unique constraint on 'CustomUserGroup', fields ['user', 'name']
         db.delete_unique('app_customusergroup', ['user_id', 'name'])
 
@@ -161,14 +171,14 @@ class Migration(SchemaMigration):
         # Deleting model 'PromotionGroup'
         db.delete_table('app_promotiongroup')
 
-        # Deleting model 'UserGroupPromotion'
-        db.delete_table('app_usergrouppromotion')
+        # Removing M2M table for field users on 'PromotionGroup'
+        db.delete_table('app_promotiongroup_users')
 
         # Deleting model 'WishList'
         db.delete_table('app_wishlist')
 
-        # Deleting model 'WishListProduct'
-        db.delete_table('app_wishlistproduct')
+        # Removing M2M table for field products on 'WishList'
+        db.delete_table('app_wishlist_products')
 
 
     models = {
@@ -201,6 +211,7 @@ class Migration(SchemaMigration):
             'description': ('django.db.models.fields.TextField', [], {}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '80'}),
+            'photo': ('django.db.models.fields.URLField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'}),
             'price': ('django.db.models.fields.DecimalField', [], {'max_digits': '12', 'decimal_places': '2'}),
             'resume': ('django.db.models.fields.CharField', [], {'max_length': '80'})
         },
@@ -216,15 +227,16 @@ class Migration(SchemaMigration):
             'product': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['app.Product']"}),
             'retailer': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['app.Retailer']"}),
             'start_date': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'url': ('django.db.models.fields.URLField', [], {'max_length': '400', 'null': 'True'})
+            'url': ('django.db.models.fields.URLField', [], {'max_length': '400', 'null': 'True', 'blank': 'True'})
         },
         'app.promotiongroup': {
-            'Meta': {'object_name': 'PromotionGroup'},
+            'Meta': {'unique_together': "(('user', 'promotion'),)", 'object_name': 'PromotionGroup'},
+            'active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'create_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'promotion': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'promotion'", 'to': "orm['app.Promotion']"}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'user'", 'to': "orm['app.CustomUser']"}),
-            'users': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['app.CustomUser']", 'through': "orm['app.UserGroupPromotion']", 'symmetrical': 'False'})
+            'users': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'promotion_group_users'", 'symmetrical': 'False', 'to': "orm['app.CustomUser']"})
         },
         'app.retailer': {
             'Meta': {'object_name': 'Retailer'},
@@ -238,30 +250,14 @@ class Migration(SchemaMigration):
             'url': ('django.db.models.fields.URLField', [], {'max_length': '400', 'null': 'True'}),
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '80'})
         },
-        'app.usergrouppromotion': {
-            'Meta': {'object_name': 'UserGroupPromotion'},
-            'group': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['app.PromotionGroup']"}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'join_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'left_date': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['app.CustomUser']"})
-        },
         'app.wishlist': {
-            'Meta': {'object_name': 'WishList'},
+            'Meta': {'unique_together': "(('user', 'name'),)", 'object_name': 'WishList'},
             'create_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '80'}),
-            'products': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['app.Product']", 'through': "orm['app.WishListProduct']", 'symmetrical': 'False'}),
-            'remove_date': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
+            'products': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'wishlist_product'", 'symmetrical': 'False', 'to': "orm['app.Product']"}),
+            'remove_date': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['app.CustomUser']"})
-        },
-        'app.wishlistproduct': {
-            'Meta': {'object_name': 'WishListProduct'},
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'join_date': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'left_date': ('django.db.models.fields.DateTimeField', [], {'null': 'True'}),
-            'product': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['app.Product']"}),
-            'wishlist': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['app.WishList']"})
         }
     }
 

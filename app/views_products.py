@@ -2,7 +2,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
-from models import CustomUser,Product,WishList,WishListProduct
+from models import CustomUser,Product,WishList
 from login import Login,access_required
 import json
 from django.core.paginator import Paginator
@@ -35,8 +35,6 @@ def list(request,*kwargs):
 	},)
 @access_required
 def detail(request,pk,*kwargs):	
-	
-	
 	try:
 		object = Product.objects.get(pk=pk)
 	except Exception,e:
@@ -44,6 +42,7 @@ def detail(request,pk,*kwargs):
 	user = Login(request).getUser()
 	promotions =  object.promotion_set.all()
 	wish = WishList(user = user)
+	#wish.products = [object]
 	wishlistform = WishListProductForm(instance = wish )
 	
 	if request.POST:
@@ -51,8 +50,7 @@ def detail(request,pk,*kwargs):
 			wishlistform = WishListProductForm(request.POST,instance = wish )
 			if wishlistform.is_valid():
 				wish = wishlistform.save()
-				wp = WishListProduct(wishlist=wish,product=object)
-				wp.save()
+				wish.products = [object]
 	
 	return render(request, 'facebook/product_detail.html', {
 		'object': object,
