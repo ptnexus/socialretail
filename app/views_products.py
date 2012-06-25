@@ -2,11 +2,13 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
-from models import CustomUser,Product
+from models import CustomUser,Product,WishList,WishListProduct
 from login import Login,access_required
 import json
 from django.core.paginator import Paginator
-	
+from forms import WishListProductForm
+
+
 @access_required
 def list(request,*kwargs):	
 	products = []
@@ -34,16 +36,31 @@ def list(request,*kwargs):
 @access_required
 def detail(request,pk,*kwargs):	
 	
+	
 	try:
 		object = Product.objects.get(pk=pk)
 	except Exception,e:
 		return redirect('products-list')
 	user = Login(request).getUser()
-	print dir(user)
 	promotions =  object.promotion_set.all()
-	print dir(user.wishlist_set.all()[0])
+	wish = WishList(user = user)
+	wishlistform = WishListProductForm(instance = wish )
+	
+	if request.POST:
+		if 'action' in request.POST and request.POST.get('action','') == 'create_wishlist':
+			wishlistform = WishListProductForm(request.POST,instance = wish )
+			if wishlistform.is_valid():
+				wish = wishlistform.save()
+				wp = WishListProduct(wishlist=wish,product=object)
+				wp.save()
+	
 	return render(request, 'facebook/product_detail.html', {
 		'object': object,
 		'promotions':map(lambda x: x.getPromotionInfo(user), promotions),
 		'wishlists':user.wishlist_set.all(),
+		'wishlistform':wishlistform,
 	},)
+
+	
+	
+	return redirect('product-detail',pk = pk )

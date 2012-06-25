@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from app.models import CustomUser,CustomUserGroup
+from app.models import CustomUser,CustomUserGroup,WishList
 from django import forms
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 
@@ -30,3 +30,15 @@ class CustomUserGroupForm(forms.ModelForm):
 	class Meta:
 		model = CustomUserGroup
 		exclude = ('user',)
+		
+class WishListProductForm(forms.ModelForm):
+	def validate_unique(self):
+		exclude = self._get_validation_exclusions()
+		exclude.remove('user') # allow checking against the missing attribute
+		try:
+			self.instance.validate_unique(exclude=exclude)
+		except ValidationError, e:
+			self._update_errors(e.message_dict)
+	class Meta:
+		model = WishList
+		exclude = ('remove_date','user','products')

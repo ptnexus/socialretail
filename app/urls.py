@@ -15,6 +15,7 @@ urlpatterns = patterns('',
 	url(r'products/?$', 'app.views_products.list', name='products-list'),
 	url(r'product/(?P<pk>\d+)/?$', 'app.views_products.detail', name='product-detail'),
 	
+	
 	url(r'promotions/?$', 'app.views_promotions.list', name='promotions-list'),
 	
 	url(r'promotions_user/?$', 'app.views_profile.list_promotions', name='profile-promotion-list'),

@@ -115,14 +115,16 @@ class WishList(models.Model):
 	create_date = models.DateTimeField(u'create date',auto_now_add=True,null=False)
 	remove_date = models.DateTimeField(u'remove date',null=True,blank=True)
 	products = models.ManyToManyField(Product,through='WishListProduct')
-	
+	class Meta:
+		unique_together = ( ('user','name'),)
 
 class WishListProduct(models.Model):
 	product = models.ForeignKey(Product,)
 	wishlist = models.ForeignKey(WishList,)
 	join_date = models.DateTimeField(u'join date',auto_now_add=True,null=False)
 	left_date = models.DateTimeField(u'left date',null=True,blank=True)
-	
+	class Meta:
+		unique_together = ( ('product','wishlist'),)
     
 	
 	
