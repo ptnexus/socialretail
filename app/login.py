@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from models import Utilizador
+from models import CustomUser
 
 
 
@@ -28,13 +28,12 @@ class Login(object):
 	
 	def makeLogin(self,form):
 		try:
-			form.username = 'asdas'
-			user = Utilizador.objects.get(username = form.data['username'], password = form.data['password'])
+			user = CustomUser.objects.get(username = form.data['username'], password = form.data['password'])
 			self.request.session['login']= True
 			self.request.session['login_user'] = user
 			return True
 		except Exception,e:
-			print str(e)
+			#print str(e)
 			return False
 
 

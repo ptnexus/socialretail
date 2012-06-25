@@ -1,0 +1,36 @@
+<div class="well">
+	<table class="table table-striped">
+		<thead>
+			<th width="1%">Options</th>
+			<th>Name</th>
+		</thead>
+		<tbody>
+		{% for wishlist in wishlists %}
+			
+			<tr>
+				<td nowrap="nowrap">
+					<img src="{{ promotion.retailer.photo }}" width="80px" />
+ 				</td>
+				<td>
+					<div>
+						{{ wishlist.name }}
+						<span class="see_list" style="float:right; cursor:pointer;">
+							Ver
+						</span>
+					</div>
+					<div class="table_wishlist_products" style="display:none;" >
+						{% include "facebook/product/wishlists_products.html"%}
+					</div>
+				</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+		<tfoot></tfoot>
+	</table>
+</div>
+
+<script>
+	$(".see_list").click(function(){
+		$(this).parents('td').find('div.table_wishlist_products').toggle();
+	});
+</script>

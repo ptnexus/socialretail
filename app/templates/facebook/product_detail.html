@@ -1,0 +1,41 @@
+{% extends "facebook/default/base.html" %}
+
+
+{% block content %}
+	<ul class="breadcrumb">
+	  <li>
+	    <a href="{% url products-list %}">Products</a> <span class="divider">/</span>
+	  </li>
+	  
+	  <li class="active">{{ object.name }}</li>
+	</ul>
+	
+<div class="tabbable"> <!-- Only required for left/right tabs -->
+	<ul class="nav nav-tabs">
+		<li class="active"><a href="#details" data-toggle="tab">Product</a></li>
+		<li><a href="#promotions" data-toggle="tab">Promotions</a></li>
+		<li><a href="#wishlists" data-toggle="tab">WishList</a></li>
+		<li><a href="#comments" data-toggle="tab">Comments</a></li>
+	</ul>
+	<div class="tab-content">
+		<div class="tab-pane active" id="details">
+			{% include "facebook/product/details.html" %}
+		</div>
+		
+		<div class="tab-pane" id="promotions">
+		  {% include "facebook/product/promotions.html" %}
+		</div>
+		
+		
+		<div class="tab-pane" id="wishlists">
+		  {% include "facebook/product/wishlists.html" %}
+		</div>
+		
+		<div class="tab-pane" id="comments">
+		  {% include "facebook/product/comments.html" %}
+		</div>
+	</div>
+</div>
+	
+	
+{% endblock %}

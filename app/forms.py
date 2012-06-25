@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
-from app.models import Utilizador,UtilizadoresGrupos
+from app.models import CustomUser,CustomUserGroup
 from django import forms
+from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
+
 
 class LoginForm(forms.Form):
     username = forms.CharField(label='Username',max_length=100, widget=forms.TextInput(
@@ -11,13 +13,20 @@ class LoginForm(forms.Form):
     ))
     remember = forms.BooleanField(required=False)
     
-class UtilizadoresGruposForm(forms.ModelForm):
+class CustomUserGroupForm(forms.ModelForm):
 	def __init__(self, *args, **kwargs):
-	    super (UtilizadoresGruposForm, self).__init__(*args, **kwargs)
-	    #self.fields['topics'].queryset = Topic.objects.filter(event=event)
-	    self.fields['amigos_grupo'].widget.attrs['class'] = "multiselect"
-	    self.fields['amigos_grupo'].widget.attrs['style'] = "width:440px;height:250px;"
-	#amigos_grupo = forms.ModelMultipleChoiceField(queryset=Utilizador.objects)
+	    super (CustomUserGroupForm, self).__init__(*args, **kwargs)
+	    self.fields['friends_groups'].widget.attrs['class'] = "multiselect"
+	    self.fields['friends_groups'].widget.attrs['style'] = "width:440px;height:250px;"
+	
+	#friends_groups = forms.ModelMultipleChoiceField(queryset=Utilizador.objects,)
+	def validate_unique(self):
+		exclude = self._get_validation_exclusions()
+		exclude.remove('user') # allow checking against the missing attribute
+		try:
+			self.instance.validate_unique(exclude=exclude)
+		except ValidationError, e:
+			self._update_errors(e.message_dict)
 	class Meta:
-		model = UtilizadoresGrupos
-		exclude = ('utilizador',)
+		model = CustomUserGroup
+		exclude = ('user',)

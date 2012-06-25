@@ -8,32 +8,58 @@
 	  <input type="text" name="search" class="input-medium search-query" value="{{ search }}">
 	  <button type="submit" class="btn">Search</button>
 	</form>
+	
 	{% if groups|length > 0 %}
 	<table class="table table-striped">
 		<thead>
+			<th width="1%"></th>
 			<th>Name</th>
 		</thead>
 		<tbody>
-			{% for group in groups %}
+			{% for group in page.object_list %}
 			<tr>
-				<td>{{ group.nome }}</td>
+				<td nowrap="nowrap">
+					<i onclick="window.location='{% url profile-friendsgroup-edit pk=group.pk %}';" 
+						class="icon-edit" style="cursor:pointer;" title="Edit">
+					</i>
+					<i onclick="if(confirm('Realy remove FriendsGroup {{ group.name }}?')) window.location='{% url profile-friendsgroup-remove pk=group.pk %}';" 
+						class="icon-remove" style="cursor:pointer;" title="Remove" >
+					</i>
+				</td>
+				<td>{{ group.name }}</td>
 			</tr>
 			{% endfor %}
 		</tbody>
 		<tfoot>
 			<tr>
-				<td>
-					
+				<td colspan="2">
 					<div class="pagination">
 					  <ul>
-					    <li><a href="#">Prev</a></li>
-					    <li class="active">
-					      <a href="#">1</a>
-					    </li>
-					    <li><a href="#">2</a></li>
-					    <li><a href="#">3</a></li>
-					    <li><a href="#">4</a></li>
-					    <li><a href="#">Next</a></li>
+					  	{% if page.has_previous %}
+					    	<li>
+					    		<a href="{% url profile-friendsgroup-list  %}?page={{ page.previous_page_number }}">
+					    		Prev
+					    		</a>
+					    	</li>
+					    {% endif %}
+					    {% for p in paginator.page_range %}
+					    	{% if page_number = p %}
+					    		<li class="active">
+							      <a href="javascript:void(0);">{{ p }}</a>
+							    </li>
+					    	{% else%}
+							    <li >
+							      <a href="{% url profile-friendsgroup-list %}?page={{ p }}">{{ p }}</a>
+							    </li>
+					    	{% endif %}
+					    {% endfor %}
+					    {% if page.has_next %}
+					    	<li>
+					    		<a href="{% url profile-friendsgroup-list %}?page={{ page.next_page_number }}">
+					    		Next
+					    		</a>
+					    	</li>
+					    {% endif %}
 					  </ul>
 					</div>
 				</td>

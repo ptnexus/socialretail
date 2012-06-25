@@ -1,40 +1,41 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
-from models import Utilizador,Retalhista,Produto,Campanha
-from models import Grupo,GrupoUtilizadores,WishList
-from models import WishListProdutos,UtilizadoresGrupos
 
-class UtilizadorAdmin(admin.ModelAdmin):
+
+from models import *
+
+class CustomUserAdmin(admin.ModelAdmin):
     pass
-admin.site.register(Utilizador, UtilizadorAdmin)
+admin.site.register(CustomUser, CustomUserAdmin)
 
 """
 class GrupoUtilizadoresInline(admin.TabularInline):
 	model = GrupoUtilizadores
 """
-class UtilizadoresGruposAdmin(admin.ModelAdmin):
+class CustomUserGroupAdmin(admin.ModelAdmin):
 	pass
 	"""
     inlines = [
     	UtilizadoresGruposInline
     ]
     """
-admin.site.register(UtilizadoresGrupos, UtilizadoresGruposAdmin)
+admin.site.register(CustomUserGroup, CustomUserGroupAdmin)
 
 
 
-class RetalhistaAdmin(admin.ModelAdmin):
+class RetailerAdmin(admin.ModelAdmin):
     pass
-admin.site.register(Retalhista, RetalhistaAdmin)
+admin.site.register(Retailer, RetailerAdmin)
 
-class ProdutoAdmin(admin.ModelAdmin):
+class ProductAdmin(admin.ModelAdmin):
     pass
-admin.site.register(Produto, ProdutoAdmin)
+admin.site.register(Product, ProductAdmin)
 
-class CampanhaAdmin(admin.ModelAdmin):
+class PromotionAdmin(admin.ModelAdmin):
     pass
-admin.site.register(Campanha, CampanhaAdmin)
+admin.site.register(Promotion, PromotionAdmin)
 
+"""
 class GrupoUtilizadoresInline(admin.TabularInline):
 	model = GrupoUtilizadores
 
@@ -43,14 +44,26 @@ class GrupoAdmin(admin.ModelAdmin):
     	GrupoUtilizadoresInline
     ]
 admin.site.register(Grupo, GrupoAdmin)
+"""
+
+class UserGroupPromotionInline(admin.TabularInline):
+	model = UserGroupPromotion
+
+class PromotionGroupAdmin(admin.ModelAdmin):
+	inlines = [
+    	UserGroupPromotionInline
+    ]
+
+admin.site.register(PromotionGroup, PromotionGroupAdmin)
 
 
-class WishListProdutosInline(admin.TabularInline):
-    model = WishListProdutos
+
+class WishListProductInline(admin.TabularInline):
+    model = WishListProduct
 
 class WishListAdmin(admin.ModelAdmin):
     inlines = [
-    	WishListProdutosInline
+    	WishListProductInline
     ]
     
 admin.site.register(WishList, WishListAdmin)

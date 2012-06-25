@@ -1,0 +1,39 @@
+<div class="well">
+
+	<table class="table table-striped">
+		<thead>
+			<th>Retailer</th>
+			<th>Price</th>
+			<th>Group Elements</th>
+			<th>End date</th>
+			<th>Retailer Link</th>
+			<th>Join</th>
+		</thead>
+		<tbody>
+		{% for p_object in promotions %}
+			{% with promotion=p_object.promotion %}
+			<tr>
+				<td>
+					<img src="{{ promotion.retailer.photo }}" width="80px" />
+ 				</td>
+				<td>{{ promotion.formattedprice }}</td>
+				<td>{{ promotion.elements_number }}</td>
+				<td>{{ promotion.end_date|date:'d-m-Y H:i'  }}</td>
+				<td>
+					{% if promotion.url %}
+					<a href="{{ promotion.url }}" target="_blank">Link</a>
+					{% else %}
+					N/A
+					{% endif %}
+				</td>
+				<td>
+					{{ p_object.join }}
+				</td>
+			</tr>
+			{% endwith %}
+		{% endfor %}
+		</tbody>
+		<tfoot></tfoot>
+	</table>
+		   
+</div>

@@ -3,10 +3,12 @@
 
 {% block content %}
 	<h3>Products List</h3>
-	<form class="well form-search">
-	  <input type="text" class="input-medium search-query">
-	  <button type="submit" class="btn">Search</button>
+	<form class="well form-search" method="post">
+		{% csrf_token %}
+	  	<input type="text" class="input-medium search-query" name="search" value="{{ search }}">
+	  	<button type="submit" class="btn">Search</button>
 	</form>
+	
 	<table class="table table-striped">
 		<thead>
 			<th>Photo</th>
@@ -14,21 +16,22 @@
 			<th>Base Price</th>
 		</thead>
 		<tbody>
-			<tr>
-				<td>dfgh</td>
-				<td>dfgh</td>
-				<td>dfgh</td>
+			{% for product in page.object_list %}
+			<tr style="cursor:pointer;" onclick="window.location='{% url product-detail pk=product.pk %}';" >
+				<td>
+					<img src="{{ product.photo }}" width="80px" />
+ 				</td>
+				<td>
+					<a href="javascript:void(0);" rel="popover" 
+						title="{{ product.name }}" 
+						data-content="{{ product.resume }}"
+					>
+						{{ product.name }}
+					</a>
+				</td>
+				<td>{{ product.formattedprice }}</td>
 			</tr>
-			<tr>
-				<td>dfgh</td>
-				<td>dfgh</td>
-				<td>dfgh</td>
-			</tr>
-			<tr>
-				<td>dfgh</td>
-				<td>dfgh</td>
-				<td>dfgh</td>
-			</tr>
+			{% endfor %}
 		</tbody>
 		<tfoot>
 			<tr>
@@ -36,14 +39,31 @@
 					
 					<div class="pagination">
 					  <ul>
-					    <li><a href="#">Prev</a></li>
-					    <li class="active">
-					      <a href="#">1</a>
-					    </li>
-					    <li><a href="#">2</a></li>
-					    <li><a href="#">3</a></li>
-					    <li><a href="#">4</a></li>
-					    <li><a href="#">Next</a></li>
+					    {% if page.has_previous %}
+					    	<li>
+					    		<a href="{% url products-list  %}?page={{ page.previous_page_number }}">
+					    		Prev
+					    		</a>
+					    	</li>
+					    {% endif %}
+					    {% for p in paginator.page_range %}
+					    	{% if page_number = p %}
+					    		<li class="active">
+							      <a href="javascript:void(0);">{{ p }}</a>
+							    </li>
+					    	{% else%}
+							    <li >
+							      <a href="{% url products-list %}?page={{ p }}">{{ p }}</a>
+							    </li>
+					    	{% endif %}
+					    {% endfor %}
+					    {% if page.has_next %}
+					    	<li>
+					    		<a href="{% url products-list %}?page={{ page.next_page_number }}">
+					    		Next
+					    		</a>
+					    	</li>
+					    {% endif %}
 					  </ul>
 					</div>
 				</td>

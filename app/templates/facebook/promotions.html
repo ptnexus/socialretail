@@ -3,8 +3,9 @@
 
 {% block content %}
 	<h3>Promotions List</h3>
-	<form class="well form-search">
-	  <input type="text" class="input-medium search-query">
+	<form class="well form-search" method="post">
+	  {% csrf_token %}
+	  <input type="text" class="input-medium search-query" name="search" value="{{ search }}" >
 	  <button type="submit" class="btn">Search</button>
 	</form>
 	<table class="table table-striped">
@@ -17,42 +18,47 @@
 			
 		</thead>
 		<tbody>
+			{% for promotion in page.object_list %}
 			<tr>
 				<td>dfgh</td>
-				<td>dfgh</td>
+				<td>{{ promotion.product.name }}</td>
 				<td>dfgh</td>
 				<td>dfgh</td>
 				<td>dfgh</td>
 			</tr>
-			<tr>
-				<td>dfgh</td>
-				<td>dfgh</td>
-				<td>dfgh</td>
-				<td>dfgh</td>
-				<td>dfgh</td>
-			</tr>
-			<tr>
-				<td>dfgh</td>
-				<td>dfgh</td>
-				<td>dfgh</td>
-				<td>dfgh</td>
-				<td>dfgh</td>
-			</tr>
+			{% endfor %}
+			
 		</tbody>
 		<tfoot>
 			<tr>
 				<td colspan="5">
-					
 					<div class="pagination">
 					  <ul>
-					    <li><a href="#">Prev</a></li>
-					    <li class="active">
-					      <a href="#">1</a>
-					    </li>
-					    <li><a href="#">2</a></li>
-					    <li><a href="#">3</a></li>
-					    <li><a href="#">4</a></li>
-					    <li><a href="#">Next</a></li>
+					    {% if page.has_previous %}
+					    	<li>
+					    		<a href="{% url promotions-list  %}?page={{ page.previous_page_number }}">
+					    		Prev
+					    		</a>
+					    	</li>
+					    {% endif %}
+					    {% for p in paginator.page_range %}
+					    	{% if page_number = p %}
+					    		<li class="active">
+							      <a href="javascript:void(0);">{{ p }}</a>
+							    </li>
+					    	{% else%}
+							    <li >
+							      <a href="{% url promotions-list %}?page={{ p }}">{{ p }}</a>
+							    </li>
+					    	{% endif %}
+					    {% endfor %}
+					    {% if page.has_next %}
+					    	<li>
+					    		<a href="{% url promotions-list %}?page={{ page.next_page_number }}">
+					    		Next
+					    		</a>
+					    	</li>
+					    {% endif %}
 					  </ul>
 					</div>
 				</td>
