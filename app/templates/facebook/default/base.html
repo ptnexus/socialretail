@@ -52,6 +52,9 @@
 		.table th, .table td {
 			padding:3px;
 		}
+		.well{
+			padding: 10px;
+		}
     </style>
     
 </head>
@@ -75,7 +78,12 @@
 		    	</div>
 		    </div>
 		    <div class="row-fluid">
-		      <div class="span6" style="width:135px; box-shadow: 5px 5px 5px #EAEAEA;">
+		      <div class="span6" style="
+		      	width:135px;
+		      	box-shadow: 5px 0px 5px whiteSmoke;
+		      	border-top-right-radius: 10px;
+				border-bottom-right-radius: 10px;
+		      ">
 		      	{% block left_menu %}
 		      		{% include "facebook/default/left_menu.html" %}
 		      	{% endblock left_menu %}
