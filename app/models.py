@@ -2,29 +2,30 @@
 from django.db import models
 
 # Create your models here.
-
+"""
 class CustomUserManager(models.Manager):
     def with_counts(self):
         from django.db import connection
         cursor = connection.cursor()
-        cursor.execute("""
+        cursor.execute("
             SELECT p.id, p.question, p.poll_date, COUNT(*)
             FROM polls_opinionpoll p, polls_response r
             WHERE p.id = r.poll_id
             GROUP BY 1, 2, 3
-            ORDER BY 3 DESC""")
+            ORDER BY 3 DESC")
         result_list = []
         for row in cursor.fetchall():
             p = self.model(id=row[0], question=row[1], poll_date=row[2])
             p.num_responses = row[3]
             result_list.append(p)
         return result_list
+"""
 
 class CustomUser(models.Model):
 	username = models.CharField('username',max_length=80,null=False,blank=False,unique=True)
 	password = models.CharField('password',max_length=80,null=False,blank=False)
 	email = models.EmailField('email',null=False,blank=False,unique=True)
-	facebookid = models.IntegerField('facebookid',null=True,unique=True)
+	facebookid = models.IntegerField('facebookid',null=True,unique=True,blank=True)
 	name = models.CharField('name',max_length=80,null=False,blank=False)
 	birth_date = models.DateField(u'birth date',null=False)
 	join_date = models.DateTimeField(u'join date',auto_now_add=True,null=False)

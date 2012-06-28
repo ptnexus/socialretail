@@ -25,7 +25,18 @@
 					</i>
 				</td>
 				<td>
-					{{ wishlist.name }}
+					<div>
+						<span class="wishlist_name">{{ wishlist.name }}</span>
+						<span title="see products" class="see_list" 
+							style="float:right; cursor:pointer;" 
+							data-visible="0" >
+							See Products
+							<i class="icon-chevron-down"></i>
+						</span>
+					</div>
+					<div class="table_wishlist_products" style="display:none;" >
+						{% include "facebook/product/wishlists_products.html"%}
+					</div>
  				</td>
 			</tr>
 			{% endfor %}
@@ -67,4 +78,26 @@
 			</tr>
 		</tfoot>
 	</table>
+<script>
+$(".see_list").click(function(){
+		var melem = this;
+		$(this).parents('tbody').find('span.see_list[data-visible=1]').each(function(i,elem){
+			if(elem != melem){
+				$(elem).attr('data-visible',0).find('i').attr('class','icon-chevron-down');
+				$(elem).parents('td').find('div.table_wishlist_products').hide('normal');
+			}
+		});
+		
+		$(this).find('i').attr('class','');
+		if($(this).attr("data-visible")=="0"){
+			$(this).attr("data-visible",1);
+			$(this).find('i').addClass('icon-chevron-up');
+		}else{
+			$(this).attr("data-visible",0);
+			$(this).find('i').addClass('icon-chevron-down');
+		}
+		
+		$(this).parents('td').find('div.table_wishlist_products').toggle('slow');
+});
+</script>
 {% endblock %}

@@ -7,8 +7,6 @@
 		<th>Base Price</th>
 	</thead>
 	<tbody>
-		
-		
 		{% for product in products %}
 		<tr style="cursor:pointer;" onclick="window.location='{% url product-detail pk=product.pk %}';" >
 			<td>

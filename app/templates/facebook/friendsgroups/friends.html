@@ -1,0 +1,26 @@
+{% with friends=group.friends_groups.all %}
+{% if friends %}
+<table class="table table-striped" >
+	<thead>
+		<th>Photo</th>
+		<th>Name</th>
+	</thead>
+	<tbody>
+		{% for friend in friends %}
+		<tr style="cursor:pointer;" >
+			<td>
+				<img src="{{ friend.photo }}" width="80px" />
+			</td>
+			<td>
+				{{ friend.name }}
+			</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+	<tfoot>
+	</tfoot>
+</table>
+{% else %}
+	No Friends
+{% endif%}
+{% endwith %}

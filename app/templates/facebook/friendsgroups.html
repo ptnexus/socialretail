@@ -26,7 +26,21 @@
 						class="icon-remove" style="cursor:pointer;" title="Remove" >
 					</i>
 				</td>
-				<td>{{ group.name }}</td>
+				<td>
+					
+					<div>
+						<span class="group_name">{{ group.name }}</span>
+						<span title="see friends" class="see_friends" 
+							style="float:right; cursor:pointer;" 
+							data-visible="0" >
+							See Friends
+							<i class="icon-chevron-down"></i>
+						</span>
+					</div>
+					<div class="table_friends_groups" style="display:none;" >
+						{% include "facebook/friendsgroups/friends.html"%}
+					</div>
+				</td>
 			</tr>
 			{% endfor %}
 		</tbody>
@@ -66,6 +80,30 @@
 			</tr>
 		</tfoot>
 	</table>
+	
+<script>
+$(".see_friends").click(function(){
+		var melem = this;
+		$(this).parents('tbody').find('span.see_friends[data-visible=1]').each(function(i,elem){
+			if(elem != melem){
+				$(elem).attr('data-visible',0).find('i').attr('class','icon-chevron-down');
+				$(elem).parents('td').find('div.table_friends_groups').hide('normal');
+			}
+		});
+		
+		$(this).find('i').attr('class','');
+		if($(this).attr("data-visible")=="0"){
+			$(this).attr("data-visible",1);
+			$(this).find('i').addClass('icon-chevron-up');
+		}else{
+			$(this).attr("data-visible",0);
+			$(this).find('i').addClass('icon-chevron-down');
+		}
+		
+		$(this).parents('td').find('div.table_friends_groups').toggle('slow');
+});
+</script>
+
 	{% else %}
 		No Groups
 	{% endif %}

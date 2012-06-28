@@ -16,14 +16,16 @@
 		</thead>
 		<tbody>
 			{% for retailer in page.object_list %}
-			<tr style="cursor:pointer;" onclick="window.location='{% url retailer-detail pk=retailer.pk %}';">
+			<tr style="cursor:pointer;">
 				<td>
 					<img src="{{ retailer.photo }}" width="80px" />
 				</td>
-				<td>{{ retailer.name }}</td>
+				<td>
+					<a href="{% url retailer-detail pk=retailer.pk %}" >{{ retailer.name }}</a>
+				</td>
 				<td>
 					{% if retailer.url %}
-						<a href="{{ retailer.url }}" target="_blank">Link</a>
+						<a href="{{ retailer.url }}" target="_blank">Webpage</a>
 					{% else %}
 					N/A
 					{% endif %}
