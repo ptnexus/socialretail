@@ -2,7 +2,7 @@
 
 from models import CustomUser
 
-
+from myjson import MyJson
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
@@ -44,6 +44,27 @@ def access_required(function=None):
 			login = Login(request)
 			if not login.hasLogin():
 				return HttpResponseRedirect(reverse('login-view'))
+			else:
+				return view_func(request, *args, **kwargs)
+
+		_view.__name__ = view_func.__name__
+		_view.__dict__ = view_func.__dict__
+		_view.__doc__ = view_func.__doc__
+		return _view
+	
+	if function is None:
+		return _dec
+	else:
+		return _dec(function)
+
+
+def access_required_ajax(function=None):
+	def _dec(view_func):
+		def _view(request, *args, **kwargs):
+			login = Login(request)
+			if not login.hasLogin():
+				ajax = MyJson().addError('Without Login')
+				return ajax.getJsonRequest()
 			else:
 				return view_func(request, *args, **kwargs)
 

@@ -52,6 +52,7 @@ def detail(request,pk,*kwargs):
 				wish = wishlistform.save()
 				wish.products = [object]
 	
+	
 	return render(request, 'facebook/product_detail.html', {
 		'object': object,
 		'promotions':map(lambda x: x.getPromotionInfo(user), promotions),

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.http import HttpResponse
 from django.shortcuts import render,redirect
-from models import CustomUser,CustomUserGroup
+from models import CustomUser,CustomUserGroup,Promotion,PromotionGroup
 from login import Login,access_required
 from forms import CustomUserGroupForm
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
@@ -12,11 +12,37 @@ import json
 
 @access_required
 def list_promotions(request,*kwargs):
-	return render(request, 'facebook/promotions_user.html', {},)
+	
+	user = Login(request).getUser()
+	promotions = []
+	search = ''
+	if 'search' in request.POST and request.POST['search'] != '':
+		search = request.POST['search']
+		promotions = PromotionGroup.objects.filter(promotion__name_icontains = search).select_related('promotion')
+	else:
+		promotions = PromotionGroup.objects.select_related('promotion')
+	paginator = Paginator(promotions, 10)
+	try:
+		page = int(request.GET.get('page',1))
+	except:
+		page = 1
+	if page > paginator.num_pages:
+		page = paginator.num_pages
+	if page < 1:
+		page = 1
+		
+	return render(request, 'facebook/promotions_user.html', {
+		'paginator': paginator,
+		'search':search,
+		'page': paginator.page(page),	
+		'page_number':page,
+	},)
 	
 @access_required
 def list_history_promotions(request,*kwargs):
 	return render(request, 'facebook/promotions_user_history.html', {},)
+	
+
 	
 @access_required
 def list_friendsgroup(request,*kwargs):

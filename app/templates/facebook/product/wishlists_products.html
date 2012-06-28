@@ -1,3 +1,5 @@
+{% with products=wishlist.products.all %}
+{% if products %}
 <table class="table table-striped" >
 	<thead>
 		<th>Photo</th>
@@ -5,7 +7,9 @@
 		<th>Base Price</th>
 	</thead>
 	<tbody>
-		{% for product in wishlist.products.all %}
+		
+		
+		{% for product in products %}
 		<tr style="cursor:pointer;" onclick="window.location='{% url product-detail pk=product.pk %}';" >
 			<td>
 				<img src="{{ product.photo }}" width="80px" />
@@ -25,3 +29,7 @@
 	<tfoot>
 	</tfoot>
 </table>
+{% else %}
+	No Products
+{% endif%}
+{% endwith %}

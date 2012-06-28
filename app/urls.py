@@ -6,16 +6,6 @@ urlpatterns = patterns('',
     url(r'^about_us$', 'app.views.about_us', name='about-us-view'),
     url(r'login/?$', 'app.views.login', name='login-view'),
     url(r'logout/?$', 'app.views.logout', name='logout-view'),
- 
-    
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	url(r'loaddata/?$', 'app.views.loaddata',name='loaddata-view'),    
 )
@@ -64,4 +54,8 @@ urlpatterns += patterns('',
 
 urlpatterns += patterns('',
 	url(r'promotions/?$', 'app.views_promotions.list', name='promotions-list'),
+)
+
+urlpatterns += patterns('',
+	url(r'ajax/wishlist/(?P<product_pk>\d+)/?$', 'app.views_ajax.wishlist', name='wishlist-ajax'),
 )

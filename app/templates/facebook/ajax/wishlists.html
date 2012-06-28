@@ -1,0 +1,139 @@
+<div class="well" id="div_wishlist">
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th width="1%"></th>
+				<th width="1%"></th>
+				<th>Name</th>
+			</tr>
+			<tr>
+				<th colspan="3">
+					<input type="text" placeholder="Search" id="wishlist_search" class="input-medium search-query" name="search" >
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+		{% for wishlist in wishlists %}
+			<tr data-pk="{{ wishlist.pk }}" >
+				<td nowrap="nowrap" class="wishlist_actions">
+					<i class="icon-remove" data-action="wishlist_remove">
+					</i>
+ 				</td>
+ 				<td class="wishlist_actions" nowrap="nowrap" >
+ 					<i 
+ 						class="{% if wishlist.hasProduct %}icon-remove-sign{% else %}icon-plus-sign{% endif %}"
+ 						data-action="{% if wishlist.hasProduct %}wishlist_remove_product{% else %}wishlist_add_product{% endif %}"
+ 					></i>
+ 				</td>
+				<td>
+					<div>
+						<span class="wishlist_name">{{ wishlist.name }}</span>
+						<span title="see products" class="see_list" 
+							style="float:right; cursor:pointer;" 
+							data-visible="0" >
+							See Products
+							<i class="icon-chevron-down"></i>
+						</span>
+					</div>
+					<div class="table_wishlist_products" style="display:none;" >
+						{% include "facebook/product/wishlists_products.html"%}
+					</div>
+				</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+		<tfoot></tfoot>
+	</table>
+	
+	<div>
+		<div style="cursor:pointer;" class="add_new_wishlist">
+			<i class=" icon-plus"></i> add to a new wishlist
+		</div>
+		
+		
+		<div {% if not wishlistform.errors %} style="display:none;" {% endif %} class="add_new_wishlist_form" >
+			<form class="well form-horizontal" method="post" style="width:auto;">
+				<fieldset>
+					{{ wishlistform.errors }}
+					{% csrf_token %}
+					<input name="action" value="create_wishlist" type="hidden" />
+					<div style="width:350px;">
+						{{ wishlistform.name.label }} : {{ wishlistform.name }}
+						
+					</div>
+					<div class="form-actions" style="margin-bottom:-18px;">
+			            <button type="submit" class="btn btn-primary">Create</button>
+			            <button class="btn" id="cancel_create_wishlist" onclick="return false;">Cancel</button>
+			        </div>
+				</fieldset>
+			</form>
+		</div>
+	</div>
+	
+	<form class="well form-horizontal" id="form_wishlist_actions" method="post" style="display:none;">
+		actions purpose <br/>
+		{% csrf_token %}
+		<input type="text" name="action" value="">
+		<input type="text" name="pk" value="">
+		
+	</form>
+
+</div>
+
+<script>
+	$(".see_list").click(function(){
+		var melem = this;
+		$(this).parents('tbody').find('span.see_list[data-visible=1]').each(function(i,elem){
+			if(elem != melem){
+				$(elem).attr('data-visible',0).find('i').attr('class','icon-chevron-down');
+				$(elem).parents('td').find('div.table_wishlist_products').hide('normal');
+			}
+		});
+		
+		$(this).find('i').attr('class','');
+		if($(this).attr("data-visible")=="0"){
+			$(this).attr("data-visible",1);
+			$(this).find('i').addClass('icon-chevron-up');
+		}else{
+			$(this).attr("data-visible",0);
+			$(this).find('i').addClass('icon-chevron-down');
+		}
+		
+		$(this).parents('td').find('div.table_wishlist_products').toggle('slow');
+	});
+	$('#cancel_create_wishlist').click(function(){
+		$('.add_new_wishlist_form').hide('fast');
+	});
+	$('.add_new_wishlist').click(function(){
+		$('.add_new_wishlist_form').show('slow');
+	});
+	
+	
+	$('#div_wishlist').find('form').each(function(i,form){
+		
+		$(this).submit(function() {
+			console.log(form);
+			console.log('asdasd');
+
+		  $('#div_wishlist').parent().trigger('reload',this);
+		  return false;
+		});
+	});
+	
+	$('#wishlist_search').keyup(function(){
+		var value = $(this).val();
+		$(this).parents('table').find('span.wishlist_name').each(function(){
+			if( $(this).html().indexOf(value) >= 0)
+				$(this).parents('tr').show();
+			else
+				$(this).parents('tr').hide();
+		});
+	});
+	
+	$('.wishlist_actions i').click(function(){
+		$('#form_wishlist_actions').find('input[name=pk]').val($(this).parents('tr').attr('data-pk'));
+		$('#form_wishlist_actions').find('input[name=action]').val($(this).attr('data-action'));
+		$('#form_wishlist_actions').trigger('submit');
+	});
+	
+</script>
