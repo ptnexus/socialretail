@@ -21,9 +21,7 @@
 			{% include "facebook/retailer/details.html" %}
 		</div>
 		
-		<div class="tab-pane" id="promotions">
-		  {% include "facebook/product/promotions.html" %}
-		</div>
+		<div class="tab-pane" id="promotions"></div>
 		
 		<div class="tab-pane" id="comments">
 		  {% include "facebook/product/comments.html" %}
@@ -31,6 +29,53 @@
 		
 	</div>
 </div>
-	
+
+<script>
+	jQuery.extend({
+	   postJSON: function( url, data, callback) {
+	      return jQuery.post(url, data, callback, "json");
+	   }
+	});
+
+	$(function() {
+		function myreloadAjax(elem,form,url){
+			
+			if(typeof form != "undefined" ){
+				form = $(form).parents('form');
+				$.postJSON((elem,form,url),$(form).serialize(), function(data) {
+				  	if(data.ok){
+				    	$(elem).html(data.data);
+				    }
+				}).complete(function(){
+					elem.trigger('ajaxstop');
+				});
+			}else{
+				$.getJSON((elem,form,url), function(data) {
+				  	if(data.ok){
+				    	$(elem).html(data.data);
+				    }
+				}).complete(function(){
+					elem.trigger('ajaxstop');
+				});
+			}
+			$(elem).html('').trigger('ajaxstart');
+		}
+		
+		$('#promotions').bind('reload',function(event,form){
+			myreloadAjax($(this),form,'{% url retailer-promotion-ajax retailer_pk=object.pk %}');
+		});
+		
+		
+		$('#promotions,#comments').bind('ajaxstart',function(){
+			console.log('start');
+		}).bind('ajaxstop',function(){
+			console.log('stop');
+		});
+		
+		$("a[href='#comments'],a[href='#promotions']").click(function(event){
+			$($(this).attr('href')).trigger('reload');
+		});
+	});
+</script>
 	
 {% endblock %}

@@ -133,7 +133,12 @@
 	$('.wishlist_actions i').click(function(){
 		$('#form_wishlist_actions').find('input[name=pk]').val($(this).parents('tr').attr('data-pk'));
 		$('#form_wishlist_actions').find('input[name=action]').val($(this).attr('data-action'));
-		$('#form_wishlist_actions').trigger('submit');
+		if($(this).attr('data-action'))
+		if( $(this).attr('data-action')== 'wishlist_remove' ){
+			if ( confirm('Really remove wishlist?') )
+				$('#form_wishlist_actions').trigger('submit');
+		}else
+			$('#form_wishlist_actions').trigger('submit');
 	});
 	
 </script>

@@ -22,9 +22,7 @@
 			{% include "facebook/product/details.html" %}
 		</div>
 		
-		<div class="tab-pane" id="promotions" style="height:100%" >
-		  {% include "facebook/product/promotions.html" %}
-		</div>
+		<div class="tab-pane" id="promotions" style="height:100%" ></div>
 		
 		<div class="tab-pane" id="wishlists" style="height:100%" ></div>
 		
@@ -41,13 +39,11 @@
 	});
 
 	$(function() {
-		$('#wishlists').bind('reload',function(event,form,f2){
-			
-			var elem = $(this);
+		function myreloadAjax(elem,form,url){
 			
 			if(typeof form != "undefined" ){
 				form = $(form).parents('form');
-				$.postJSON('{% url wishlist-ajax product_pk=object.pk %}',$(form).serialize(), function(data) {
+				$.postJSON((elem,form,url),$(form).serialize(), function(data) {
 				  	if(data.ok){
 				    	$(elem).html(data.data);
 				    }
@@ -55,8 +51,7 @@
 					elem.trigger('ajaxstop');
 				});
 			}else{
-				console.log('4');
-				$.getJSON('{% url wishlist-ajax product_pk=object.pk %}', function(data) {
+				$.getJSON((elem,form,url), function(data) {
 				  	if(data.ok){
 				    	$(elem).html(data.data);
 				    }
@@ -65,7 +60,15 @@
 				});
 			}
 			$(elem).html('').trigger('ajaxstart');
+		}
+		
+		$('#wishlists').bind('reload',function(event,form){
+			myreloadAjax($(this),form,'{% url wishlist-ajax product_pk=object.pk %}');
 		});
+		$('#promotions').bind('reload',function(event,form){
+			myreloadAjax($(this),form,'{% url product-promotion-ajax product_pk=object.pk %}');
+		});
+		
 		
 		$('#wishlists,#promotions,#comments').bind('ajaxstart',function(){
 			console.log('start');

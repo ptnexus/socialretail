@@ -58,4 +58,6 @@ urlpatterns += patterns('',
 
 urlpatterns += patterns('',
 	url(r'ajax/wishlist/(?P<product_pk>\d+)/?$', 'app.views_ajax.wishlist', name='wishlist-ajax'),
+	url(r'ajax/promotion/(?P<product_pk>\d+)/?$', 'app.views_ajax.promotions', name='product-promotion-ajax'),
+	url(r'ajax/retailerpromotion/(?P<retailer_pk>\d+)/?$', 'app.views_ajax.retailer_promotions', name='retailer-promotion-ajax'),
 )

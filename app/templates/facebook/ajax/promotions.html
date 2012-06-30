@@ -1,0 +1,86 @@
+<div class="well" id="div_promotions">
+
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>Retailer</th>
+				<th>Price</th>
+				<th>Group Elements</th>
+				<th>End date</th>
+				<th>Retailer Link</th>
+				<th>Join</th>
+			</tr>
+			<!--
+			<tr>
+				<th colspan="6">
+					<input type="text" placeholder="Search" id="promotions_search" class="input-medium search-query" name="search" >
+				</th>
+			</tr>
+			-->
+		</thead>
+		<tbody>
+		{% for p_object in promotions %}
+			{% with promotion=p_object.promotion %}
+			<tr>
+				<td>
+					<img src="{{ promotion.retailer.photo }}" width="80px" />
+ 				</td>
+				<td>{{ promotion.formattedprice }}</td>
+				<td>{{ promotion.elements_number }}</td>
+				<td>{{ promotion.end_date|date:'d-m-Y H:i'  }}</td>
+				<td>
+					{% if promotion.url %}
+					<a href="{{ promotion.url }}" target="_blank">Link</a>
+					{% else %}
+					N/A
+					{% endif %}
+				</td>
+				<td>
+					{{ p_object.join }}
+				</td>
+			</tr>
+			{% endwith %}
+		{% endfor %}
+		</tbody>
+		<tfoot></tfoot>
+	</table>
+		   
+</div>
+
+
+<script>
+	
+	
+	$('#div_promotions').find('form').each(function(i,form){
+		
+		$(this).submit(function() {
+			console.log(form);
+			console.log('asdasd');
+
+		  $('#div_wishlist').parent().trigger('reload',this);
+		  return false;
+		});
+	});
+	
+	$('#promotions_search').keyup(function(){
+		var value = $(this).val();
+		$(this).parents('table').find('span.wishlist_name').each(function(){
+			if( $(this).html().indexOf(value) >= 0)
+				$(this).parents('tr').show();
+			else
+				$(this).parents('tr').hide();
+		});
+	});
+	
+	$('.wishlist_actions i').click(function(){
+		$('#form_wishlist_actions').find('input[name=pk]').val($(this).parents('tr').attr('data-pk'));
+		$('#form_wishlist_actions').find('input[name=action]').val($(this).attr('data-action'));
+		if($(this).attr('data-action'))
+		if( $(this).attr('data-action')== 'wishlist_remove' ){
+			if ( confirm('Really remove wishlist?') )
+				$('#form_wishlist_actions').trigger('submit');
+		}else
+			$('#form_wishlist_actions').trigger('submit');
+	});
+	
+</script>
