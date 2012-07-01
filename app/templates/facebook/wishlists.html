@@ -2,7 +2,9 @@
 
 
 {% block content %}
-	<h3>Wishlist List</h3>
+	<ul class="breadcrumb">
+	  <li class="active">Wishlist</li>
+	</ul>
 	<form class="well form-search" method="post">
 		{% csrf_token %}
 	  <input type="text" class="input-medium search-query" name="search" value="{{ search }}">

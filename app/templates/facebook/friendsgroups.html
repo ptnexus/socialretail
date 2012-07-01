@@ -2,7 +2,10 @@
 
 
 {% block content %}
-	<h3>Friends Groups List</h3>
+	<ul class="breadcrumb">
+	  <li class="active">Friends Groups</li>
+	</ul>
+	
 	<form class="well form-search" method="post">
 	  {% csrf_token %}
 	  <input type="text" name="search" class="input-medium search-query" value="{{ search }}">

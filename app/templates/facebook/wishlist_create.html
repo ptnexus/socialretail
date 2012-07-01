@@ -10,7 +10,15 @@
 			margin-left:100px;
 		}
 	</style>
-	<h3>{% block fiends_title %}Wishlist Create{% endblock %}</h3>
+	<h3></h3>
+	<ul class="breadcrumb">
+	  <li>
+	    <a href="{% url wishlists-list %}">Wishlist</a> <span class="divider">/</span>
+	  </li>
+	  <li class="active">{% block fiends_title %}Wishlist Create{% endblock %}</li>
+	</ul>
+	
+	
 	<form class="well form-horizontal" method="post" style="width:auto;">
 		{{ form.errors }}
 		{% csrf_token %}
