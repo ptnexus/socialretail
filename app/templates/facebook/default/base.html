@@ -8,6 +8,8 @@
     <link type="text/css" href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet" />
     <link type="text/css" href="{{ STATIC_URL }}css/bootstrap-responsive.min.css" rel="stylesheet" />
     <link type="text/css" href="{{ STATIC_URL }}css/ui.multiselect.css" rel="stylesheet" />
+    <link type="text/css" href="{{ STATIC_URL }}css/jquery.notifyBar.css" rel="stylesheet" />
+    
 	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.7.2.min.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.8.21.custom.min.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
@@ -17,13 +19,24 @@
 	<script type="text/javascript" src="{{ STATIC_URL }}js/plugins/localisation/jquery.localisation-min.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/plugins/scrollTo/jquery.scrollTo-min.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/ui.multiselect.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.notifyBar.js"></script>
+	
 	<script type="text/javascript">
 		$(function(){
 			$.localise('ui-multiselect', {/*language: 'en',*/ path: 'js/locale/'});
 			$(".multiselect").multiselect();
 			$('a[rel=tooltip]').tooltip();
 			$('a[rel=popover]').popover();
+			{% if flash.message %}
+				$.notifyBar({ cls: "success", html: "{{ flash.message }}" });
+			{% endif %}
+			{% if flash.error %}
+				$.notifyBar({ cls: "error", html: "{{ flash.error }}" });
+			{% endif %}
+			
+			
 		});
+		
 	</script>
     
     <style>

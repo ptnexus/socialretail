@@ -110,20 +110,16 @@
 	
 	
 	$('#div_wishlist').find('form').each(function(i,form){
-		
 		$(this).submit(function() {
-			console.log(form);
-			console.log('asdasd');
-
 		  $('#div_wishlist').parent().trigger('reload',this);
 		  return false;
 		});
 	});
 	
 	$('#wishlist_search').keyup(function(){
-		var value = $(this).val();
+		var value = $(this).val().toUpperCase();
 		$(this).parents('table').find('span.wishlist_name').each(function(){
-			if( $(this).html().indexOf(value) >= 0)
+			if( $(this).html().toUpperCase().indexOf(value) >= 0)
 				$(this).parents('tr').show();
 			else
 				$(this).parents('tr').hide();

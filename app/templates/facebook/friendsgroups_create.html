@@ -18,7 +18,6 @@
 	</ul>
 	
 	<form class="well form-horizontal" method="post" style="width:auto;">
-		{{ form.errors }}
 		{% csrf_token %}
 		<fieldset>
 		{% for field in form %}

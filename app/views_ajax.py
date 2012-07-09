@@ -12,11 +12,9 @@ from myjson import MyJson
 import json
 from django.template.loader import render_to_string
 
-
 @access_required_ajax
 def wishlist(request,product_pk,*kwargs):
-	json = MyJson()
-	
+	json = MyJson(request)
 	try:
 		product = Product.objects.get(pk= int(product_pk) )
 	except Exception,e:
@@ -28,7 +26,6 @@ def wishlist(request,product_pk,*kwargs):
 		wish = WishList(user = user)
 		try:
 			wishlistform = WishListProductForm(instance = wish )
-	
 			if request.POST:
 				if 'action' in request.POST and request.POST.get('action','') == 'create_wishlist':
 					wishlistform = WishListProductForm(request.POST,instance = wish )
@@ -48,7 +45,6 @@ def wishlist(request,product_pk,*kwargs):
 
 					except Exception,e:
 							pass
-					
 			wishlist = user.wishlist_set.all()
 			for w in wishlist:
 				w.hasProduct = w.products.filter(pk=product.pk).exists()
@@ -63,15 +59,12 @@ def wishlist(request,product_pk,*kwargs):
 		except Exception,e:
 			json.setError()
 			json.addError(str(e))
-			
 	return json.getJsonRequest()
 
 
 @access_required_ajax
 def promotions(request,product_pk,*kwargs):
-	
-	json = MyJson()
-	
+	json = MyJson(request)
 	try:
 		product = Product.objects.get(pk= int(product_pk) )
 	except Exception,e:
@@ -81,7 +74,6 @@ def promotions(request,product_pk,*kwargs):
 	if not json.isError():
 		user = Login(request).getUser()
 		promotions =  product.promotion_set.all()
-		
 		try:
 			"""
 			wishlistform = WishListProductForm(instance = wish )
@@ -115,6 +107,7 @@ def promotions(request,product_pk,*kwargs):
 				'promotions':map(lambda x: x.getPromotionInfo(user), promotions),
 				#'wishlistform':wishlistform,
 				'product':product,
+				'flash':request.flash,
 			} ).content
 			#return HttpResponse(data)
 			json.setOk()
@@ -122,16 +115,11 @@ def promotions(request,product_pk,*kwargs):
 		except Exception,e:
 			json.setError()
 			json.addError(str(e))
-		
-	
 	return json.getJsonRequest()
-
 
 @access_required_ajax
 def retailer_promotions(request,retailer_pk,*kwargs):
-	print retailer_pk
-	json = MyJson()
-	
+	json = MyJson(request)
 	try:
 		retailer = Retailer.objects.get(pk= int(retailer_pk) )
 	except Exception,e:
@@ -141,7 +129,6 @@ def retailer_promotions(request,retailer_pk,*kwargs):
 	if not json.isError():
 		user = Login(request).getUser()
 		promotions =  retailer.promotion_set.all()
-		
 		try:
 			"""
 			wishlistform = WishListProductForm(instance = wish )
@@ -170,7 +157,6 @@ def retailer_promotions(request,retailer_pk,*kwargs):
 			for w in wishlist:
 				w.hasProduct = w.products.filter(pk=product.pk).exists()
 			"""
-			
 			data = render(request,'facebook/ajax/promotions.html',{
 				'promotions':map(lambda x: x.getPromotionInfo(user), promotions),
 				#'wishlistform':wishlistform,
@@ -181,8 +167,4 @@ def retailer_promotions(request,retailer_pk,*kwargs):
 		except Exception,e:
 			json.setError()
 			json.addError(str(e))
-		
-	
 	return json.getJsonRequest()
-
-

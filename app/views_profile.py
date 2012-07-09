@@ -41,9 +41,7 @@ def list_promotions(request,*kwargs):
 @access_required
 def list_history_promotions(request,*kwargs):
 	return render(request, 'facebook/promotions_user_history.html', {},)
-	
 
-	
 @access_required
 def list_friendsgroup(request,*kwargs):
 	
@@ -84,7 +82,10 @@ def edit_or_create_friendsgroup(request,pk,*kwargs):
 		form = CustomUserGroupForm(request.POST,instance = group)
 		if form.is_valid():
 			if form.save():
+				request.flash['message'] = 'Edit friendsgroup with success' if pk is not None else 'Add friendsgroup with success'
 				return redirect('profile-friendsgroup-list')
+		else:
+			request.flash['error'] = 'Please review all errors above'
 	else:
 		form = CustomUserGroupForm(instance = group)
 	return render(request, 'facebook/friendsgroups_' + ( 'create.html'  if pk is None else 'edit.html'), {
@@ -95,6 +96,7 @@ def edit_or_create_friendsgroup(request,pk,*kwargs):
 def remove_friendsgroup(request,pk,*kwargs):
 	try:
 		Login(request).getUser().customusergroup_set.get(pk=pk).delete()
+		request.flash['message'] = 'Removed friendsgroup with success'
 	except:
 		pass
 	return redirect('profile-friendsgroup-list')

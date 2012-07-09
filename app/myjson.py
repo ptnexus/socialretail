@@ -5,14 +5,17 @@ from django.http import HttpResponse
 
 
 class MyJson(object):
-	def __init__(self,*kwargs):
+	def __init__(self,request,*kwargs):
 		super(MyJson,self).__init__(*kwargs)
 		self.message = {
 			'ok':None,
 			'error_message':None,
 			'message':None,
 			'data':None,
+			'flash':[],
 		}
+		self.request = request
+
 	def addError(self,error):
 		if self.message['error_message'] is None:
 			self.message['error_message'] = []
@@ -36,4 +39,7 @@ class MyJson(object):
 	def getJsonRequest(self):
 		if self.message['ok'] is None:
 			self.message['ok'] = False
+		if self.request.flash:
+			self.message['flash'] = self.request.flash
+			
 		return HttpResponse(simplejson.dumps(self.message), mimetype='application/json')

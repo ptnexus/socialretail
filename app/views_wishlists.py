@@ -39,6 +39,9 @@ def list(request,*kwargs):
 from django.forms.models import inlineformset_factory
 @access_required
 def edit_or_create(request,pk,*kwargs):
+	
+	
+	
 	user = Login(request).getUser()
 	if pk is None:
 		wishlist = WishList(user = user)
@@ -49,7 +52,11 @@ def edit_or_create(request,pk,*kwargs):
 		form = WishListForm(request.POST,instance = wishlist)
 		if form.is_valid():
 			if form.save():
+				request.flash['message'] = 'Edit wishlist with success' if pk is not None else 'Add wishlist with success'
 				return redirect('wishlists-list')
+		else:
+			request.flash['error'] = 'Please review all errors above'
+
 	else:
 		form = WishListForm(instance = wishlist)
 	return render(request, 'facebook/wishlist_' + ( 'create.html'  if pk is None else 'edit.html'), {
@@ -60,6 +67,7 @@ def edit_or_create(request,pk,*kwargs):
 def remove(request,pk,*kwargs):
 	try:
 		Login(request).getUser().wishlist_set.get(pk=pk).delete()
+		request.flash['message'] = 'Removed wishlist with success'
 	except:
 		pass
 	return redirect('wishlists-list')

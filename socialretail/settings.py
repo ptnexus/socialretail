@@ -4,7 +4,14 @@ PATH = os.path.realpath(os.path.dirname(__file__)+'/../')+'/'
 
 
 DEBUG = True
+
 TEMPLATE_DEBUG = DEBUG
+
+
+FLASH_IGNORE_MEDIA = True
+FLASH_STORAGE = 'session'
+FLASH_CODEC = 'json'
+
 
 ADMINS = (
     ('Bruno Sousa', 'ssbv96@gmail.com'),
@@ -99,6 +106,20 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     # Uncomment the next line for simple clickjacking protection:
     # 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'djangoflash.middleware.FlashMiddleware',
+)
+
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+	'django.contrib.auth.context_processors.auth',
+    'djangoflash.context_processors.flash',
+    "django.core.context_processors.debug",
+    "django.core.context_processors.i18n",
+    "django.core.context_processors.media",
+    "django.core.context_processors.static",
+    "django.contrib.messages.context_processors.messages",
 )
 
 ROOT_URLCONF = 'socialretail.urls'
@@ -126,6 +147,7 @@ INSTALLED_APPS = (
     'sorl',
     'south',
     'app',
+    'djangoflash',
 )
 
 # A sample logging configuration. The only tangible logging
