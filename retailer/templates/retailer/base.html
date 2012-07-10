@@ -1,0 +1,11 @@
+{% extends "facebook/default/base.html" %}
+
+{% block left_menu %}
+	{% include "retailer/menu/left_menu.html" %}
+{% endblock %}
+
+{% block top_options %}
+	<div onclick="window.location='{% url retailer-logout-view %}';" style="cursor:pointer;">
+		Logout <i class="icon-off"></i>
+	</div>
+{% endblock top_options %}

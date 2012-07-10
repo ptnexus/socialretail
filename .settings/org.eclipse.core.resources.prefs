@@ -1,5 +1,7 @@
 eclipse.preferences.version=1
+encoding//app/login.py=utf-8
 encoding//app/models.py=utf-8
 encoding//app/views.py=utf-8
 encoding//app/views_products.py=utf-8
 encoding//app/views_wishlists.py=utf-8
+encoding//retailer/login.py=utf-8
