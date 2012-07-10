@@ -9,6 +9,7 @@
     <link type="text/css" href="{{ STATIC_URL }}css/bootstrap-responsive.min.css" rel="stylesheet" />
     <link type="text/css" href="{{ STATIC_URL }}css/ui.multiselect.css" rel="stylesheet" />
     <link type="text/css" href="{{ STATIC_URL }}css/jquery.notifyBar.css" rel="stylesheet" />
+    <link type="text/css" href="{{ STATIC_URL }}css/flexigrid.css" rel="stylesheet" />
     
 	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.7.2.min.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.8.21.custom.min.js"></script>
@@ -20,6 +21,10 @@
 	<script type="text/javascript" src="{{ STATIC_URL }}js/plugins/scrollTo/jquery.scrollTo-min.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/ui.multiselect.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.notifyBar.js"></script>
+	
+	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.cookie.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/flexigrid.js"></script>
+	
 	
 	<script type="text/javascript">
 		$(function(){
@@ -67,6 +72,10 @@
 		}
 		.well{
 			padding: 10px;
+		}
+		
+		.flexigrid input,.flexigrid select{
+			width:auto;
 		}
     </style>
     

@@ -38,6 +38,31 @@ class CustomUser(models.Model):
 	def getTable(self):
 		return "<tr><td>"+self.name+"</td><td>"+self.email+"</td></tr>"
 	
+	def getTablePhoto(self):
+		return '<img src="'+self.photo+'" height="20px"" />' if self.photo else ''
+		
+	def isInvited(self,user,promotion):
+		return True
+		
+	def getGroupsNamesByUser(self,user):
+		return ','.join( self.custom_user_friends_groups.filter(user=user).order_by('name').values_list('name', flat=True) )
+
+class Messages(models.Model):
+	user_from = models.ForeignKey(CustomUser,related_name='user_from',null=False)
+	user_to = models.ForeignKey(CustomUser,related_name='user_to',null=False)
+	send_date = models.DateTimeField(u'send date',auto_now_add=True,null=False)
+	read_date = models.DateTimeField(u'read date',null=True,blank=True)
+	message = models.TextField('message')
+
+class InviteUserPromotion(models.Model):
+	message = models.ForeignKey(Messages,null=False)
+	user_from = models.ForeignKey(CustomUser,related_name='invite_user_from',null=False)
+	user_to = models.ForeignKey(CustomUser,related_name='invite_user_to',null=False)
+	send_date = models.DateTimeField(u'send date',auto_now_add=True,null=False)
+	promotion = models.ForeignKey('Promotion',null=False)
+	group = models.ForeignKey('PromotionGroup',null=False)
+
+
 class CustomUserGroup(models.Model):
 	user = models.ForeignKey(CustomUser,null=False)
 	name = models.CharField('name',max_length=80,null=False,blank=False)
@@ -45,6 +70,8 @@ class CustomUserGroup(models.Model):
 	friends_groups = models.ManyToManyField('CustomUser',related_name='custom_user_friends_groups')
 	class Meta:
 		unique_together = ( ('user','name'),)
+		
+	
 	
 class Retailer(models.Model):
 	username = models.CharField('username',max_length=80,null=False,blank=False,unique=True)
@@ -97,7 +124,7 @@ class Promotion(models.Model):
 		}
 	
 class PromotionGroup(models.Model):
-	promotion = models.ForeignKey(Promotion,null=False,related_name='promotion')
+	promotion = models.ForeignKey(Promotion,null=False,related_name='promotionGroups')
 	user = models.ForeignKey(CustomUser,null=False,related_name='user') 
 	create_date = models.DateTimeField(u'create date',auto_now_add=True,null=False)
 	#users = models.ManyToManyField(CustomUser,through='UserGroupPromotion')
@@ -105,7 +132,15 @@ class PromotionGroup(models.Model):
 	active = models.BooleanField('active',default=True)
 	class Meta:
 		unique_together = ( ('user','promotion'),)
-
+		
+	def getFriendsByUser(self,user,friends):
+		print '++++++'
+		print self.users.filter(pk__in = map(lambda x:x.pk,friends) )
+		return ','.join( 
+			self.users.filter(pk__in = map(lambda x:x.pk,friends) )
+			.exclude(pk=user.pk)
+			.values_list('name',flat=True) 
+		)
 	
 class WishList(models.Model):
 	user = models.ForeignKey(CustomUser,)

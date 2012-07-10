@@ -3,73 +3,99 @@
 
 {% block content %}
 	<ul class="breadcrumb">
-	  <li class="active">Products</li>
+	  <li>
+	    <a href="{% url promotions-list %}">Promotions</a> <span class="divider">/</span>
+	  </li>
+	  <li class="active">Promotion Detail</li>
 	</ul>
-	<form class="well form-search" method="post">
-		{% csrf_token %}
-	  	<input type="text" class="input-medium search-query" name="search" value="{{ search }}">
-	  	<button type="submit" class="btn">Search</button>
-	</form>
+	<div class="tabbable"> <!-- Only required for left/right tabs -->
+		<ul class="nav nav-tabs">
+			<li class="active"><a href="#details" data-toggle="tab">Promotion</a></li>
+			<li><a href="#friends" data-toggle="tab">Friends</a></li>
+			<li><a href="#groups" data-toggle="tab">Group you are access</a></li>
+			<li><a href="#comments" data-toggle="tab">Comments</a></li>
+			
+		</ul>
+		<div class="tab-content">
+			<div class="tab-pane active" id="details"></div>
+			
+			<div class="tab-pane" id="friends"></div>
+			
+			<div class="tab-pane" id="groups"></div>
+			
+			<div class="tab-pane" id="comments">
+			  {% include "facebook/product/comments.html" %}
+			</div>
+		</div>
+	</div>
 	
-	<table class="table table-striped">
-		<thead>
-			<th>Photo</th>
-			<th>Name</th>
-			<th>Base Price</th>
-		</thead>
-		<tbody>
-			{% for product in page.object_list %}
-			<tr style="cursor:pointer;" onclick="window.location='{% url product-detail pk=product.pk %}';" >
-				<td>
-					<img src="{{ product.photo }}" width="80px" />
- 				</td>
-				<td>
-					<a href="javascript:void(0);" rel="popover" 
-						title="{{ product.name }}" 
-						data-content="{{ product.resume }}"
-					>
-						{{ product.name }}
-					</a>
-				</td>
-				<td>{{ product.formattedprice }}</td>
-			</tr>
-			{% endfor %}
-		</tbody>
-		<tfoot>
-			<tr>
-				<td colspan="3">
-					
-					<div class="pagination">
-					  <ul>
-					    {% if page.has_previous %}
-					    	<li>
-					    		<a href="{% url products-list  %}?page={{ page.previous_page_number }}">
-					    		Prev
-					    		</a>
-					    	</li>
-					    {% endif %}
-					    {% for p in paginator.page_range %}
-					    	{% if page_number = p %}
-					    		<li class="active">
-							      <a href="javascript:void(0);">{{ p }}</a>
-							    </li>
-					    	{% else%}
-							    <li >
-							      <a href="{% url products-list %}?page={{ p }}">{{ p }}</a>
-							    </li>
-					    	{% endif %}
-					    {% endfor %}
-					    {% if page.has_next %}
-					    	<li>
-					    		<a href="{% url products-list %}?page={{ page.next_page_number }}">
-					    		Next
-					    		</a>
-					    	</li>
-					    {% endif %}
-					  </ul>
-					</div>
-				</td>
-			</tr>
-		</tfoot>
-	</table>
+	
+<script>
+	jQuery.extend({
+	   postJSON: function( url, data, callback) {
+	      return jQuery.post(url, data, callback, "json");
+	   }
+	});
+	
+	function setActiveTab(tab){
+		var elem = $("a[href="+tab+"]");
+		$(elem).parents('ul').find('li').removeClass('active');
+		$(elem).parents('li').addClass('active');
+		$(elem).parents('div.tabbable').find('div.tab-pane').removeClass('active');
+		$(tab).addClass('active');
+		$(elem).trigger('click');		
+	}
+	
+	$(function() {
+		function myreloadAjax(elem,form,url){
+			
+			if(typeof form != "undefined" ){
+				form = $(form).parents('form');
+				$.postJSON((elem,form,url),$(form).serialize(), function(data) {
+				  	if(data.ok){
+				    	$(elem).html(data.data);
+				    }
+				}).complete(function(){
+					elem.trigger('ajaxstop');
+				});
+			}else{
+				$.getJSON((elem,form,url), function(data) {
+				  	if(data.ok){
+				    	$(elem).html(data.data);
+				    }
+				}).complete(function(){
+					elem.trigger('ajaxstop');
+				});
+			}
+			$(elem).html('').trigger('ajaxstart');
+		}
+		
+		$('#friends').bind('reload',function(event,form){
+			myreloadAjax($(this),form,'{% url promotion-detail-friends-ajax pk=promotion.pk %}');
+		});
+		
+		$('#details').bind('reload',function(event,form){
+			myreloadAjax($(this),form,'{% url promotion-detail-ajax pk=promotion.pk %}');
+		});
+		
+		$('#groups').bind('reload',function(event,form){
+			myreloadAjax($(this),form,'{% url promotion-detail-groups-ajax pk=promotion.pk %}');
+		});
+		
+		$('#friends,#groups,#comments,#details').bind('ajaxstart',function(){
+			console.log('start');
+		}).bind('ajaxstop',function(){
+			console.log('stop');
+		});
+		
+		$("a[href='#friends'],a[href='#groups'],a[href='#comments'],a[href='#details']").click(function(event){
+			$($(this).attr('href')).trigger('reload');
+		});
+		
+		$('#details').trigger('reload');
+		
+		
+		
+	});
+</script>
 {% endblock %}

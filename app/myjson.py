@@ -36,10 +36,13 @@ class MyJson(object):
 	def addData(self,data):
 		self.message['data'] = data
 	
+	def transformeJsonRequest(self,data):
+		return HttpResponse(simplejson.dumps(data), mimetype='application/json')
+	
 	def getJsonRequest(self):
 		if self.message['ok'] is None:
 			self.message['ok'] = False
 		if self.request.flash:
 			self.message['flash'] = self.request.flash
 			
-		return HttpResponse(simplejson.dumps(self.message), mimetype='application/json')
+		return self.transformeJsonRequest(self.message)

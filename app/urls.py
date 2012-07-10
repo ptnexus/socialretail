@@ -49,6 +49,9 @@ urlpatterns += patterns('',
 	url(r'^promotions_user/?$', 'app.views_profile.list_promotions', name='profile-promotion-list'),
 	url(r'^promotions_user_history/?$', 'app.views_profile.list_history_promotions', 
 			name='profile-promotion-history-list'),
+	url(r'^promotions_user_detail/(?P<pk>\d+)/?$', 'app.views_promotions.promotion_detail', name='promotion-detail'),
+			
+	
 )
 
 
@@ -58,6 +61,18 @@ urlpatterns += patterns('',
 
 urlpatterns += patterns('',
 	url(r'^ajax/wishlist/(?P<product_pk>\d+)/?$', 'app.views_ajax.wishlist', name='wishlist-ajax'),
-	url(r'^ajax/promotion/(?P<product_pk>\d+)/?$', 'app.views_ajax.promotions', name='product-promotion-ajax'),
-	url(r'^ajax/retailerpromotion/(?P<retailer_pk>\d+)/?$', 'app.views_ajax.retailer_promotions', name='retailer-promotion-ajax'),
+	url(r'^ajax/promotion/(?P<product_pk>\d+)/?$', 'app.views_ajax.promotions',{'retailer_pk':None}, name='product-promotion-ajax'),
+	url(r'^ajax/retailerpromotion/(?P<retailer_pk>\d+)/?$', 'app.views_ajax.promotions', {'product_pk':None}, name='retailer-promotion-ajax'),
+	
+	
+	url(r'^ajax/promotion/detail/(?P<pk>\d+)/?$', 'app.views_promotions.promotion_detail_ajax', name='promotion-detail-ajax'),
+	url(r'^ajax/promotion/friends/(?P<pk>\d+)/?$', 'app.views_promotions.promotion_detail_friends_ajax', name='promotion-detail-friends-ajax'),
+	
+	url(r'^ajax/promotion/friends/table/(?P<pk>\d+)/?$', 'app.views_promotions.promotion_detail_friends_table_ajax', name='promotion-detail-friends-table-ajax'),
+
+
+	url(r'^ajax/promotion/groups/(?P<pk>\d+)/?$', 'app.views_promotions.promotion_detail_groups_ajax', name='promotion-detail-groups-ajax'),
+	
+	url(r'^ajax/promotion/groups/table/(?P<pk>\d+)/?$', 'app.views_promotions.promotion_detail_groups_table_ajax', name='promotion-detail-groups-table-ajax'),
+	
 )

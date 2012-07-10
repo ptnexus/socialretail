@@ -101,3 +101,5 @@ def remove_friendsgroup(request,pk,*kwargs):
 	except:
 		pass
 	return redirect('profile-friendsgroup-list')
+	
+	

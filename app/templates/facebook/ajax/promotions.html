@@ -30,7 +30,7 @@
 				</td>
 				<td>
 					{% if p_object.join %}
-						<a href="javascript:void(0);" >
+						<a href="{% url promotion-detail pk=promotion.pk %}" >
 							<i class="icon-remove"></i>
 						</a>
 					{% else %}

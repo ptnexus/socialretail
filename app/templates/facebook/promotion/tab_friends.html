@@ -1,0 +1,57 @@
+<div class="well">
+	<table id="promo_friends" class="flexme2">
+	</table>
+</div>
+
+<div id="csrfmiddlewaretoken">
+{% csrf_token %}
+</div>
+
+<script>
+
+
+function test(com, grid) {
+	if (com == 'Invite') {
+		confirm('Delete ' + $('.trSelected', grid).length + ' items?')
+	} else if (com == 'Invite All') {
+		alert('Add New Item');
+	}
+}
+
+$("#promo_friends").flexigrid({
+	url: '{% url promotion-detail-friends-table-ajax pk=promotion.pk %}',
+	dataType: 'json',
+	colModel : [
+		{display: 'Photo', name : 'photo', width : 60, align: 'center'},
+		{display: 'Name', name : 'name', width : 180, sortable : true, align: 'left'},
+		{display: 'Groups', name : 'groups', width : 240, align: 'left'},
+		{display: 'Is invited', name : 'idInvited', width : 45, align: 'left'},
+		],
+	buttons : [
+		{name: 'Invite', bclass: 'invite', onpress : test},
+		{name: 'Invite All', bclass: 'invite_all', onpress : test},
+		{separator: true}
+		],
+	searchitems : [
+		{display: 'groups', name : 'groups'},
+		{display: 'Name', name : 'name', isdefault: true}
+		],
+	sortname: "name",
+	sortorder: "asc",
+	usepager: true,
+	title: 'Friends',
+	useRp: true,
+	rp: 15,
+	//showTableToggleBtn: true,
+	width: 565,
+	height: 150,
+	onSubmit: function(){ 
+        $("#promo_friends").flexOptions({params: [ 
+            {name:'csrfmiddlewaretoken', value: $('#csrfmiddlewaretoken input:eq(0)').val() } 
+        ]});
+        return true; 
+    },
+    
+});
+
+</script>
