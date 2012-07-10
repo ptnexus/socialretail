@@ -10,7 +10,7 @@
 <script>
 
 
-function test(com, grid) {
+function friends_table_buttons(com, grid) {
 	if (com == 'Invite') {
 		confirm('Delete ' + $('.trSelected', grid).length + ' items?')
 	} else if (com == 'Invite All') {
@@ -28,8 +28,8 @@ $("#promo_friends").flexigrid({
 		{display: 'Is invited', name : 'idInvited', width : 45, align: 'left'},
 		],
 	buttons : [
-		{name: 'Invite', bclass: 'invite', onpress : test},
-		{name: 'Invite All', bclass: 'invite_all', onpress : test},
+		{name: 'Invite', bclass: 'invite', onpress : friends_table_buttons},
+		{name: 'Invite All', bclass: 'invite_all', onpress : friends_table_buttons},
 		{separator: true}
 		],
 	searchitems : [

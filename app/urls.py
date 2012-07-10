@@ -75,4 +75,9 @@ urlpatterns += patterns('',
 	
 	url(r'^ajax/promotion/groups/table/(?P<pk>\d+)/?$', 'app.views_promotions.promotion_detail_groups_table_ajax', name='promotion-detail-groups-table-ajax'),
 	
+	url(r'^ajax/promotion/groups/join/(?P<pk>\d+)/?$', 'app.views_promotions.promotion_detail_groups_join_ajax', name='promotion-detail-groups-join-ajax'),
+	
+	url(r'^ajax/promotion/groups/leave/(?P<pk>\d+)/?$', 'app.views_promotions.promotion_detail_groups_leave_ajax', name='promotion-detail-groups-leave-ajax'),
+	
+	url(r'^ajax/promotion/groups/create/(?P<pk>\d+)/?$', 'app.views_promotions.promotion_detail_groups_create_ajax', name='promotion-detail-groups-create-ajax'),
 )

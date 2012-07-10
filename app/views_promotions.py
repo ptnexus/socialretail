@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.http import HttpResponse
-from django.shortcuts import render
-from models import CustomUser,Promotion
+from django.shortcuts import render, redirect
+from models import CustomUser,Promotion, PromotionGroup
 from django.db.models import Q
 from login import Login,access_required,access_required_ajax
 from myjson import MyJson
@@ -39,19 +39,23 @@ def list(request,*kwargs):
 @access_required
 def promotion_detail(request,pk,*kwargs):
 	promotion = None
+	promotion_status = 'close'
 	try:
 		
 		promotion = Promotion.objects.get(pk=pk)
-		
-				
-	except:
-		request.flash['error'] = 'Error in request'
+		user = Login(request).getUser()
+		promotion_status = promotion.getPromotionStatusForUser(user)
+			
+	except Exception,e:
+		#request.flash['error'] = 'Error in request'
+		request.flash['error'] = str(e)
 		return redirect('profile-promotion-list')
 	
 	return render(request, 'facebook/promotion/detail.html', {
 		'promotion': promotion,
 		'product': promotion.product,
 		'retailer': promotion.retailer,
+		'promotion_status':promotion_status,
 	},)
 	
 @access_required_ajax
@@ -60,10 +64,12 @@ def promotion_detail_ajax(request,pk,*kwargs):
 	try:
 		promotion = Promotion.objects.get(pk=pk)
 		user = Login(request).getUser()
+		promotion_status = promotion.getPromotionStatusForUser(user)
 		inPromotion = promotion.userInPromotion(user)
 		friendsInPromotion = []
 		if inPromotion:
-			friendsInPromotion = user.promotion_group_users.get(promotion=promotion).users.exclude(user=user).all()
+			pp = user.promotion_group_users.get(promotion=promotion)
+			friendsInPromotion = pp.users.exclude(user=user).all()
 		
 		data = render(request, 'facebook/promotion/tab_detail.html', {
 					'promotion': promotion,
@@ -71,7 +77,8 @@ def promotion_detail_ajax(request,pk,*kwargs):
 					'retailer': promotion.retailer,
 					'inPromotion':inPromotion,
 					'friendsInPromotion':friendsInPromotion,
-					'friendsNeed':promotion.elements_number-1-len(friendsInPromotion)
+					'friendsNeed':promotion.elements_number-1-len(friendsInPromotion),
+					'promotion_status':promotion_status,
 				},
 				).content
 		json.setOk()
@@ -124,7 +131,7 @@ def promotion_detail_groups_table_ajax(request,pk,*kwargs):
 	
 	users = user.friends.all()
 	
-	promotions = promotion.promotionGroups.filter(users__in = users)
+	promotions = promotion.promotionGroups.filter(users__in = users).exclude(users__in = [user])
 	""""	
 	if request.POST.get('qtype',None) is not None:
 		if request.POST.get('qtype',None) == 'name':
@@ -186,7 +193,8 @@ def promotion_detail_friends_ajax(request,pk,*kwargs):
 		inPromotion = promotion.userInPromotion(user)
 		friendsInPromotion = []
 		if inPromotion:
-			friendsInPromotion = user.promotion_group_users.get(promotion=promotion).users.exclude(user=user).all()
+			pp = user.promotion_group_users.get(promotion=promotion)
+			friendsInPromotion = pp.users.exclude(user=user).all()
 		
 		data = render(request, 'facebook/promotion/tab_friends.html', {
 					'promotion': promotion,
@@ -194,7 +202,7 @@ def promotion_detail_friends_ajax(request,pk,*kwargs):
 					'retailer': promotion.retailer,
 					'inPromotion':inPromotion,
 					'friendsInPromotion':friendsInPromotion,
-					'friendsNeed':promotion.elements_number-1-len(friendsInPromotion)
+					'friendsNeed':promotion.elements_number-1-len(friendsInPromotion),
 				},
 				).content
 		json.setOk()
@@ -265,8 +273,97 @@ def promotion_detail_friends_table_ajax(request,pk,*kwargs):
 	
 	
 
-
+@access_required_ajax
+def promotion_detail_groups_join_ajax(request,pk,*kwargs):
+	json = MyJson(request)
+	try:
+		promotion = Promotion.objects.get(pk=pk)
+		if not promotion.promotionIsActive():
+			raise Exception('Promotion is not active')
+		
+		user = Login(request).getUser()
+		
+		if 'group' not in request.POST:
+			raise Exception('Group don\'t exists')
+		#user.promotions = 
+		group_id = int( request.POST.get('group',None) )
+		print group_id
+		groups = promotion.promotionGroups.filter(users__in = [user])
+		for g in groups.all():
+			if g.win_date is None and g.active:
+				g.users.remove(user)
+			else:
+				raise Exception('You are in a group that wins the promotion or the promotion is not active')
+		
+		pg = PromotionGroup.objects.get(promotion = promotion, pk=group_id,active=True,win_date__exact = None)
+		pg.users.add(user)
+		pg.postSave()
+		data = {}
+		json.addData(data)
+		json.addMessage('You join with successfull')
+		json.setOk()
+	except Exception,e:
+		json.setError()
+		json.addError(str(e))
+		
+	return json.getJsonRequest()
 	
+
+@access_required_ajax
+def promotion_detail_groups_leave_ajax(request,pk,*kwargs):
+	json = MyJson(request)
+	try:
+		promotion = Promotion.objects.get(pk=pk)
+		if not promotion.promotionIsActive():
+			raise Exception('Promotion is not active')
+		
+		user = Login(request).getUser()
+		
+		groups = promotion.promotionGroups.filter(users__in = [user])
+		for g in groups.all():
+			if g.win_date is None and g.active:
+				g.users.remove(user)
+			else:
+				raise Exception('You are in a group that wins the promotion or the promotion is not active')
+		data = {}
+		json.addData(data)
+		json.addMessage('You leave with successfull')
+		json.setOk()
+	except Exception,e:
+		json.setError()
+		json.addError(str(e))
+		
+	return json.getJsonRequest()
+
+@access_required_ajax
+def promotion_detail_groups_create_ajax(request,pk,*kwargs):
+	json = MyJson(request)
+	try:
+		promotion = Promotion.objects.get(pk=pk)
+		if not promotion.promotionIsActive():
+			raise Exception('Promotion is not active')
+		user = Login(request).getUser()
+		groups = promotion.promotionGroups.filter(users__in = [user])
+		for g in groups.all():
+			if g.win_date is None and g.active:
+				g.users.remove(user)
+			else:
+				raise Exception('You are in a group that wins the promotion or the promotion is not active')
+		pg,c = PromotionGroup.objects.get_or_create(user = user, promotion = promotion)
+		if c:
+			pg.save()
+		pg.users.add(user)
+		pg.postSave()
+		
+		data = {}
+		json.addData(data)
+		json.addMessage('You create a group with successfull')
+		json.setOk()
+	except Exception,e:
+		json.setError()
+		json.addError(str(e))
+		
+	return json.getJsonRequest()
 	
 	
 	

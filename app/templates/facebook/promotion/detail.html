@@ -11,8 +11,10 @@
 	<div class="tabbable"> <!-- Only required for left/right tabs -->
 		<ul class="nav nav-tabs">
 			<li class="active"><a href="#details" data-toggle="tab">Promotion</a></li>
+			{% if promotion_status = 'available' %}
 			<li><a href="#friends" data-toggle="tab">Friends</a></li>
 			<li><a href="#groups" data-toggle="tab">Group you are access</a></li>
+			{% endif %}
 			<li><a href="#comments" data-toggle="tab">Comments</a></li>
 			
 		</ul>

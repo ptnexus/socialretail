@@ -8,14 +8,12 @@
 					<form class="form-horizontal">
 		      			<fieldset>
 			    			<legend> <a href="{% url product-detail pk=product.pk %}">{{ product.name }}</a>
-			    				
 			    				<span style="float:right">
 			    					&nbsp;&nbsp;{{ promotion.formattedprice }}
 			    				</span>
 			    				<span style="float:right; text-decoration:line-through; font-size:15px;">
 			    					{{ product.formattedprice }}
 			    				</span>
-			    				
 			    			</legend>
 						    <div class="control-group">
 						      <h5>Description</h5>
@@ -28,14 +26,22 @@
 			<div class="row-fluid">
 				<h4>
 				{% if inPromotion %}
-					{% if friendsInPromotion|length > 0 %}
-						<p>You are in this promotion with {{ friendsInPromotion|length }} friends:</p>
+					{% if promotion_status = 'win' %}
+						<p>You win this promotion with {{ friendsInPromotion|length }} friends:</p>
 					{% else %}
-						<p>You are alone in this promotion.</p>
+						{% if friendsInPromotion|length > 0 %}
+							<p>You are in this promotion with {{ friendsInPromotion|length }} friends:</p>
+						{% else %}
+							<p>You are alone in this promotion.</p>
+						{% endif %}
 					{% endif %}
 				{% else %}
+					{% if promotion_status = 'close' %}
+					<p>This promotion is closed</p>
+					{% else %}
 					<p> You're not in any group of this promotion.</p>
-					<p> <a>Join now?</a> hurry up, this offer ends in {{ promotion.end_date|date:'d-m-Y H:i' }} </p>
+					<p> <a href="javascript:void(0);" onclick="setActiveTab('#groups');" >Join now?</a> hurry up, this offer ends in {{ promotion.end_date|date:'d-m-Y H:i' }} </p>
+					{% endif %}
 				{% endif %}
 				</h4>
 				{% if inPromotion %}
@@ -52,12 +58,14 @@
 						</tbody>
 					</table>
 					{% endif %}
+					{% if promotion_status = 'available' %}
 					<h4>
 						<p>
 							You only need {{ friendsNeed }} more friends. 
 							<a href="javascript:void(0);" onclick="setActiveTab('#friends');" >Invite now?</a> 
 						</p>
 					</h4>
+					{% endif %}
 				{% endif %}
 			</div>
 			<div class="row-fluid">

@@ -23,7 +23,7 @@
 			{% for promotion in page.object_list %}
 				{% with product=promotion.product %}
 				<tr>
-					<td>
+					<td style="cursor:pointer;" onclick="window.location='{% url promotion-detail pk=promotion.pk %}';">
 						<img src="{{ product.photo }}" width="80px" />
 					
 					</td>

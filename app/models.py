@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
+from datetime import datetime
+from django.utils.timezone import utc
 
 # Create your models here.
 """
@@ -20,6 +22,8 @@ class CustomUserManager(models.Manager):
             result_list.append(p)
         return result_list
 """
+
+
 
 class CustomUser(models.Model):
 	username = models.CharField('username',max_length=80,null=False,blank=False,unique=True)
@@ -104,7 +108,7 @@ class Promotion(models.Model):
 	retailer = models.ForeignKey(Retailer,null=False)
 	price = models.DecimalField('price',decimal_places=2,max_digits=12,null=False)
 	start_date = models.DateTimeField('start date',auto_now=True,null=False)
-	end_date = models.DateTimeField('end date',null=True)
+	end_date = models.DateTimeField('end date',null=True,blank=True)
 	create_date = models.DateTimeField(u'create date',auto_now_add=True,null=False)
 	elements_number = models.IntegerField(u'elements number',null=False)
 	groups_max_number = models.IntegerField(u'groups max number',null=True) 
@@ -123,10 +127,29 @@ class Promotion(models.Model):
 			'join':self.userInPromotion(user),
 		}
 	
+	def promotionIsActive(self):
+		if not self.active or ( self.end_date is not None and self.end_date < datetime.now() ):
+			return False
+		return True
+	
+	def getPromotionStatusForUser(self,user):
+		if self.userInPromotion(user):
+			if user.promotion_group_users.get(promotion=self).win_date is not None:
+				return 'win'
+				
+		if not self.promotionIsActive():
+			return 'close'
+			
+		return 'available'
+		
+	def groupsLimit(self):
+		return self.groups_max_number is None or self.promotionGroups.exlcude(win_date__exact=None).count() > self.groups_max_number
+	
 class PromotionGroup(models.Model):
 	promotion = models.ForeignKey(Promotion,null=False,related_name='promotionGroups')
 	user = models.ForeignKey(CustomUser,null=False,related_name='user') 
 	create_date = models.DateTimeField(u'create date',auto_now_add=True,null=False)
+	win_date = models.DateTimeField(u'win date',null=True,blank=True)
 	#users = models.ManyToManyField(CustomUser,through='UserGroupPromotion')
 	users = models.ManyToManyField(CustomUser,related_name='promotion_group_users')
 	active = models.BooleanField('active',default=True)
@@ -134,14 +157,20 @@ class PromotionGroup(models.Model):
 		unique_together = ( ('user','promotion'),)
 		
 	def getFriendsByUser(self,user,friends):
-		print '++++++'
-		print self.users.filter(pk__in = map(lambda x:x.pk,friends) )
+		#print self.users.filter(pk__in = map(lambda x:x.pk,friends) )
 		return ','.join( 
 			self.users.filter(pk__in = map(lambda x:x.pk,friends) )
 			.exclude(pk=user.pk)
 			.values_list('name',flat=True) 
 		)
-	
+	def postSave(self):
+		if self.users.count() >= self.promotion.elements_number: #ver se não é melhor por igual
+			self.win_date = datetime.now()
+			#falta emitir vale
+			if self.promotion.groups_max_number is not None:
+				if self.promotion.groupsLimit():
+					self.promotion.active = False
+		
 class WishList(models.Model):
 	user = models.ForeignKey(CustomUser,)
 	name = models.CharField('name',max_length=80,null=False,blank=False)

@@ -3,18 +3,76 @@
 	</table>
 </div>
 
-<div id="csrfmiddlewaretoken">
+<div id="csrfmiddlewaretoken_groups" style="display:none;">
 {% csrf_token %}
+
+<form id="from_join_group">
+	{% csrf_token %}
+	<input name="group" type="text" value="xpto" id="form_group_id" />
+</form>
+
+
 </div>
 
 <script>
+var inGroup = {% if inPromotion %}true{% else %}false{% endif %};
 
-
-function test(com, grid) {
-	if (com == 'Invite') {
-		confirm('Delete ' + $('.trSelected', grid).length + ' items?')
-	} else if (com == 'Invite All') {
-		alert('Add New Item');
+function group_table_buttons(com, grid) {
+	if (com == 'Join') {
+		var items_selected = $('.trSelected', grid);
+		if(items_selected.length == 1){
+			if(!inGroup || 
+				confirm('You are already in a group. If you want to join this one, you automatic exit the group you are. Proced anyway?')
+			){
+				$("#form_group_id").val( $(items_selected).attr('id').substring(3) );
+				
+				form = $("#from_join_group");
+				$.postJSON(
+					(grid,form,'{% url promotion-detail-groups-join-ajax pk=promotion.pk %}'),
+					form.serialize(), 
+					function(data) {
+					//console.log(data);
+					return;
+					//fixme por mensagem de sucesso ou erro
+				  	if(data.ok){
+				    	$(elem).html(data.data);
+				    }
+				}).complete(function(){
+					$("#csrfmiddlewaretoken_groups").parent().trigger('reload');
+				});
+				
+				
+			}
+		}else{
+			alert('Please select one Group');
+		}		
+		
+	}else if(com=='Leave group' && confirm('Really leave the group you are?')){
+		$.getJSON(
+			(grid,null,'{% url promotion-detail-groups-leave-ajax pk=promotion.pk %}'),
+			function(data) {
+			//console.log(data);
+			return;
+			//fixme por mensagem de sucesso ou erro
+		  	if(data.ok){
+		    	$(elem).html(data.data);
+		    }
+		}).complete(function(){
+			$("#csrfmiddlewaretoken_groups").parent().trigger('reload');
+		});
+	}else if(com=='Create new group' && confirm('Really leave the group you are?')){
+		$.getJSON(
+			(grid,null,'{% url promotion-detail-groups-create-ajax pk=promotion.pk %}'),
+			function(data) {
+			//console.log(data);
+			return;
+			//fixme por mensagem de sucesso ou erro
+		  	if(data.ok){
+		    	$(elem).html(data.data);
+		    }
+		}).complete(function(){
+			$("#csrfmiddlewaretoken_groups").parent().trigger('reload');
+		});
 	}
 }
 
@@ -28,12 +86,17 @@ $("#promo_groups").flexigrid({
 		{display: 'Friends Left', name : 'friendsLeft', width : 60, align: 'left'},
 		],
 	buttons : [
-		{name: 'Join', bclass: 'invite_all', onpress : test},
-		{separator: true}
+		{name: 'Join', bclass: 'join', onpress : group_table_buttons},
+		{separator: true},
+		{% if inPromotion %}
+		{name: 'Leave group', bclass: 'leave', onpress : group_table_buttons},
+		{% else %}
+		{name: 'Create new group', bclass: 'create_new_group', onpress : group_table_buttons},
+		{% endif %}
 		],
 	searchitems : [
 		{display: 'groups', name : 'groups'},
-		{display: 'Name', name : 'name', isdefault: true}
+		{display: 'Name', name : 'name', isdefault: true},
 		],
 	sortname: "name",
 	sortorder: "asc",
@@ -46,7 +109,7 @@ $("#promo_groups").flexigrid({
 	height: 150,
 	onSubmit: function(){ 
         $("#promo_groups").flexOptions({params: [ 
-            {name:'csrfmiddlewaretoken', value: $('#csrfmiddlewaretoken input:eq(0)').val() } 
+            {name:'csrfmiddlewaretoken', value: $('#csrfmiddlewaretoken_groups input:eq(0)').val() } 
         ]});
         return true; 
     },
