@@ -23,7 +23,7 @@
 	
 	<script type="text/javascript">
 		$(function(){
-			$.localise('ui-multiselect', {/*language: 'en',*/ path: 'js/locale/'});
+			$.localise('ui-multiselect', {/*language: 'en',*/ path: '{{ STATIC_URL }}js/locale/'});
 			$(".multiselect").multiselect();
 			$('a[rel=tooltip]').tooltip();
 			$('a[rel=popover]').popover();

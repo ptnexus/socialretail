@@ -4,5 +4,8 @@
 {% block fiends_title %}Wishlist Edit{% endblock %}
 {% block friends_options %}
 	<button type="submit" class="btn btn-primary">Save Changes</button>
-	<button type="submit" class="btn btn-primary">Delete</button>
+	{{ form.pk }}
+	<button type="button" class="btn btn-primary"
+	onclick="if(confirm('Realy remove wishlist {{ form.name }}?')) window.location='{% url wishlist-remove pk=1 %}';" 
+	>Delete</button>
 {% endblock %}

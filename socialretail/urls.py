@@ -4,11 +4,16 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 admin.autodiscover()
 
+from django.http import HttpResponsePermanentRedirect
+
 urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'socialretail.views.home', name='home'),
-    url(r'^', include('app.urls')),
-
+    url(r'^/?$', lambda request: HttpResponsePermanentRedirect('application')),
+    url(r'^application/', include('app.urls')),
+	
+	
+	url(r'^backoffice/', include('retailer.urls')),
     # Uncomment the admin/doc line below to enable admin documentation:
     # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
