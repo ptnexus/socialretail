@@ -61,6 +61,7 @@ def edit_or_create(request,pk,*kwargs):
 		form = WishListForm(instance = wishlist)
 	return render(request, 'facebook/wishlist_' + ( 'create.html'  if pk is None else 'edit.html'), {
 		'form': form,
+		'wishlist':wishlist,
 	},)
 
 @access_required

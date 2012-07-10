@@ -25,7 +25,7 @@
 					<i onclick="window.location='{% url profile-friendsgroup-edit pk=group.pk %}';" 
 						class="icon-edit" style="cursor:pointer;" title="Edit">
 					</i>
-					<i onclick="if(confirm('Realy remove FriendsGroup {{ form.name }}?')) window.location='{% url profile-friendsgroup-remove pk=form.pk %}';" 
+					<i onclick="if(confirm('Realy remove FriendsGroup {{ group.name }}?')) window.location='{% url profile-friendsgroup-remove pk=group.pk %}';" 
 						class="icon-remove" style="cursor:pointer;" title="Remove" >
 					</i>
 				</td>

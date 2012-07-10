@@ -8,15 +8,8 @@
 				<th>Group Elements</th>
 				<th>End date</th>
 				<th>Retailer Link</th>
-				<th>Join</th>
+				<th>Options</th>
 			</tr>
-			<!--
-			<tr>
-				<th colspan="6">
-					<input type="text" placeholder="Search" id="promotions_search" class="input-medium search-query" name="search" >
-				</th>
-			</tr>
-			-->
 		</thead>
 		<tbody>
 		{% for p_object in promotions %}
@@ -36,7 +29,14 @@
 					{% endif %}
 				</td>
 				<td>
-					{{ p_object.join }}
+					{% if p_object.join %}
+						<a href="javascript:void(0);" >
+							<i class="icon-remove"></i>
+						</a>
+					{% else %}
+						<a href="javascript:void(0);">Juntar</a>
+					{% endif %}
+					
 				</td>
 			</tr>
 			{% endwith %}
@@ -49,15 +49,10 @@
 
 
 <script>
-	
-	
-	$('#div_promotions').find('form').each(function(i,form){
-		
-		$(this).submit(function() {
-			console.log(form);
-			console.log('asdasd');
 
-		  $('#div_wishlist').parent().trigger('reload',this);
+	$('#div_promotions').find('form').each(function(i,form){
+		$(this).submit(function() {
+		  $('#div_promotions').parent().trigger('reload',this);
 		  return false;
 		});
 	});

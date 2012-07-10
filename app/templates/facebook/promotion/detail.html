@@ -1,0 +1,75 @@
+{% extends "facebook/default/base.html" %}
+
+
+{% block content %}
+	<ul class="breadcrumb">
+	  <li class="active">Products</li>
+	</ul>
+	<form class="well form-search" method="post">
+		{% csrf_token %}
+	  	<input type="text" class="input-medium search-query" name="search" value="{{ search }}">
+	  	<button type="submit" class="btn">Search</button>
+	</form>
+	
+	<table class="table table-striped">
+		<thead>
+			<th>Photo</th>
+			<th>Name</th>
+			<th>Base Price</th>
+		</thead>
+		<tbody>
+			{% for product in page.object_list %}
+			<tr style="cursor:pointer;" onclick="window.location='{% url product-detail pk=product.pk %}';" >
+				<td>
+					<img src="{{ product.photo }}" width="80px" />
+ 				</td>
+				<td>
+					<a href="javascript:void(0);" rel="popover" 
+						title="{{ product.name }}" 
+						data-content="{{ product.resume }}"
+					>
+						{{ product.name }}
+					</a>
+				</td>
+				<td>{{ product.formattedprice }}</td>
+			</tr>
+			{% endfor %}
+		</tbody>
+		<tfoot>
+			<tr>
+				<td colspan="3">
+					
+					<div class="pagination">
+					  <ul>
+					    {% if page.has_previous %}
+					    	<li>
+					    		<a href="{% url products-list  %}?page={{ page.previous_page_number }}">
+					    		Prev
+					    		</a>
+					    	</li>
+					    {% endif %}
+					    {% for p in paginator.page_range %}
+					    	{% if page_number = p %}
+					    		<li class="active">
+							      <a href="javascript:void(0);">{{ p }}</a>
+							    </li>
+					    	{% else%}
+							    <li >
+							      <a href="{% url products-list %}?page={{ p }}">{{ p }}</a>
+							    </li>
+					    	{% endif %}
+					    {% endfor %}
+					    {% if page.has_next %}
+					    	<li>
+					    		<a href="{% url products-list %}?page={{ page.next_page_number }}">
+					    		Next
+					    		</a>
+					    	</li>
+					    {% endif %}
+					  </ul>
+					</div>
+				</td>
+			</tr>
+		</tfoot>
+	</table>
+{% endblock %}

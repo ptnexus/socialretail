@@ -90,6 +90,7 @@ def edit_or_create_friendsgroup(request,pk,*kwargs):
 		form = CustomUserGroupForm(instance = group)
 	return render(request, 'facebook/friendsgroups_' + ( 'create.html'  if pk is None else 'edit.html'), {
 		'form': form,
+		'group':group,
 	},)
 	
 @access_required
