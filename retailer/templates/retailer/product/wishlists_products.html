@@ -1,0 +1,33 @@
+{% with products=wishlist.products.all %}
+{% if products %}
+<table class="table table-striped" >
+	<thead>
+		<th>Photo</th>
+		<th>Name</th>
+		<th>Base Price</th>
+	</thead>
+	<tbody>
+		{% for product in products %}
+		<tr style="cursor:pointer;" onclick="window.location='{% url product-detail pk=product.pk %}';" >
+			<td>
+				<img src="{{ product.photo }}" width="80px" />
+				</td>
+			<td>
+				<a href="javascript:void(0);" rel="popover" 
+					title="{{ product.name }}" 
+					data-content="{{ product.resume }}"
+				>
+					{{ product.name }}
+				</a>
+			</td>
+			<td>{{ product.formattedprice }}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+	<tfoot>
+	</tfoot>
+</table>
+{% else %}
+	No Products
+{% endif%}
+{% endwith %}

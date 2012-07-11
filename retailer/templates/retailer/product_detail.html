@@ -1,0 +1,85 @@
+{% extends "retailer/base.html" %}
+
+
+{% block content %}
+	<ul class="breadcrumb">
+	  <li>
+	    <a href="{% url retailer-products-list %}">Products</a> <span class="divider">/</span>
+	  </li>
+	  
+	  <li class="active">{{ object.name }}</li>
+	</ul>
+	
+<div class="tabbable"> <!-- Only required for left/right tabs -->
+	<ul class="nav nav-tabs">
+		<li class="active" ><a href="#details" data-toggle="tab">Product</a></li>
+		<!--<li><a href="#promotions" data-toggle="tab">Promotions</a></li>
+		<li><a href="#wishlists" data-toggle="tab">WishList</a></li>
+		<li><a href="#comments" data-toggle="tab">Comments</a></li>-->
+	</ul>
+	<div class="tab-content">
+		<div class="tab-pane active" id="details" style="height:100%" >
+			{% include "retailer/product/details.html" %}
+		</div>
+		
+		<div class="tab-pane" id="promotions" style="height:100%" ></div>
+		
+		<div class="tab-pane" id="wishlists" style="height:100%" ></div>
+		
+		<div class="tab-pane" id="comments" style="height:100%" >
+		  {% include "retailer/product/comments.html" %}
+		</div>
+	</div>
+</div>
+<script>
+	jQuery.extend({
+	   postJSON: function( url, data, callback) {
+	      return jQuery.post(url, data, callback, "json");
+	   }
+	});
+
+	$(function() {
+		function myreloadAjax(elem,form,url){
+			
+			if(typeof form != "undefined" ){
+				form = $(form).parents('form');
+				$.postJSON((elem,form,url),$(form).serialize(), function(data) {
+				  	if(data.ok){
+				    	$(elem).html(data.data);
+				    }
+				}).complete(function(){
+					elem.trigger('ajaxstop');
+				});
+			}else{
+				$.getJSON((elem,form,url), function(data) {
+				  	if(data.ok){
+				    	$(elem).html(data.data);
+				    }
+				}).complete(function(){
+					elem.trigger('ajaxstop');
+				});
+			}
+			$(elem).html('').trigger('ajaxstart');
+		}
+		
+		$('#wishlists').bind('reload',function(event,form){
+			myreloadAjax($(this),form,'{% url wishlist-ajax product_pk=object.pk %}');
+		});
+		$('#promotions').bind('reload',function(event,form){
+			myreloadAjax($(this),form,'{% url product-promotion-ajax product_pk=object.pk %}');
+		});
+		
+		
+		$('#wishlists,#promotions,#comments').bind('ajaxstart',function(){
+			console.log('start');
+		}).bind('ajaxstop',function(){
+			console.log('stop');
+		});
+		
+		$("a[href='#wishlists'],a[href='#comments'],a[href='#promotions']").click(function(event){
+			$($(this).attr('href')).trigger('reload');
+		});
+	});
+</script>
+	
+{% endblock %}

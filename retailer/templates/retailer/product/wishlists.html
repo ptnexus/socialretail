@@ -1,0 +1,86 @@
+<div class="well">
+	<table class="table table-striped">
+		<thead>
+			<th width="1%"></th>
+			<th width="1%">Product</th>
+			<th>Name</th>
+		</thead>
+		<tbody>
+		{% for wishlist in wishlists %}
+			<tr>
+				<td nowrap="nowrap">
+					<i class="icon-remove"></i>
+ 				</td>
+ 				<td>
+ 					<i class="{% cycle "icon-plus-sign" "icon-remove-sign" %}"></i>
+ 				</td>
+				<td>
+					<div>
+						{{ wishlist.name }}
+						<span title="see products" class="see_list" 
+							style="float:right; cursor:pointer;" 
+							data-visible="0" >
+							See Products
+							<i class="icon-chevron-down"></i>
+						</span>
+					</div>
+					<div class="table_wishlist_products" style="display:none;" >
+						{% include "facebook/product/wishlists_products.html"%}
+					</div>
+				</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+		<tfoot></tfoot>
+	</table>
+	
+	<div>
+		<div style="cursor:pointer;" class="add_new_wishlist">
+			<i class=" icon-plus"></i> add to a new wishlist
+		</div>
+		<div style="display:none;" class="add_new_wishlist_form" >
+			<form class="well form-horizontal" method="post" style="width:auto;">
+				{% csrf_token %}
+				<fieldset>
+					<div style="width:350px;">
+						Name: {{ wishlistform.name }}
+					</div>
+					<div class="form-actions" style="margin-bottom:-18px;">
+			            <button type="submit" value="create_wishlist" name="action" class="btn btn-primary">Create</button>
+			            <button class="btn" id="cancel_create_wishlist" onclick="return false;">Cancel</button>
+			        </div>
+				</fieldset>
+			</form>
+		</div>
+	</div>
+</div>
+
+<script>
+	$(".see_list").click(function(){
+	
+		var melem = this;
+		$(this).parents('tbody').find('span.see_list').each(function(i,elem){
+			if($(elem).attr('data-visible')=='1' && elem != melem){
+				$(elem).attr('data-visible',0).find('i').attr('class','icon-chevron-down');
+				$(elem).parents('td').find('div.table_wishlist_products').hide('normal');
+			}
+		});
+		
+		$(this).find('i').attr('class','');
+		if($(this).attr("data-visible")=="0"){
+			$(this).attr("data-visible",1);
+			$(this).find('i').addClass('icon-chevron-up');
+		}else{
+			$(this).attr("data-visible",0);
+			$(this).find('i').addClass('icon-chevron-down');
+		}
+		
+		$(this).parents('td').find('div.table_wishlist_products').toggle('slow');
+	});
+	$('#cancel_create_wishlist').click(function(){
+		$('.add_new_wishlist_form').hide('fast');
+	});
+	$('.add_new_wishlist').click(function(){
+		$('.add_new_wishlist_form').show('slow');
+	});
+</script>

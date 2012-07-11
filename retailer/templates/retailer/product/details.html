@@ -1,0 +1,22 @@
+<div class="well">
+	<div class="container-fluid">
+			<div class="row-fluid">
+				<div class="span2">
+		  			<img src="{{ object.photo }}" />
+				</div>
+				<div class="span10">
+					<form class="form-horizontal">
+		      			<fieldset>
+			    			<legend>{{ object.name }}
+			    				<span style="float:right">{{ object.formattedprice }}</span>
+			    			</legend>
+						    <div class="control-group">
+						      <h5>Description</h5>
+						      <p>{{ object.description }}</p>
+						    </div>
+			  			</fieldset>
+		  			</form>
+				</div>
+			</div>
+	</div>
+</div>

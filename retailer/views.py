@@ -15,6 +15,14 @@ def home(request,*kwargs):
     #return HttpResponse(json.dumps(map(lambda x:{'name':x.nome,'email':x.email},Utilizador.objects.all())), mimetype="application/json")
 
 
+def about_us(request,*kwargs):
+    hasLogin = RetailerLogin(request).hasLogin()
+    return render(request, 'retailer/about_us.html', {
+        'template': 'retailer/base.html' if hasLogin else 'login.html',
+        'hasLogin':hasLogin,
+    },)
+
+
 def login(request,*kwargs):
     
     form = LoginForm(request.POST if request.POST else None)
