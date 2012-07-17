@@ -7,8 +7,9 @@
 				<th>Price</th>
 				<th>Group Elements</th>
 				<th>End date</th>
-				<th>Retailer Link</th>
-				<th>Options</th>
+				<th>Retailer Details</th>
+                <th>Are Join?</th>
+				<th>Details</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -21,6 +22,7 @@
 				<td>{{ promotion.formattedprice }}</td>
 				<td>{{ promotion.elements_number }}</td>
 				<td>{{ promotion.end_date|date:'d-m-Y H:i'  }}</td>
+                
 				<td>
 					{% if promotion.url %}
 					<a href="{{ promotion.url }}" target="_blank">Link</a>
@@ -28,15 +30,17 @@
 					N/A
 					{% endif %}
 				</td>
+                <td>
+                    {% if p_object.join %}
+                    Yes
+                    {% else %}
+                    No
+                    {% endif %}
+                </td>
 				<td>
-					{% if p_object.join %}
-						<a href="{% url promotion-detail pk=promotion.pk %}" >
-							<i class="icon-remove"></i>
-						</a>
-					{% else %}
-						<a href="javascript:void(0);">Juntar</a>
-					{% endif %}
-					
+                    <a href="{% url promotion-detail pk=promotion.pk %}" >
+                        <i class="icon-info-sign"></i>
+					</a>
 				</td>
 			</tr>
 			{% endwith %}

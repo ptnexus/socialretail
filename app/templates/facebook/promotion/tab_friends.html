@@ -12,9 +12,20 @@
 
 function friends_table_buttons(com, grid) {
 	if (com == 'Invite') {
-		confirm('Delete ' + $('.trSelected', grid).length + ' items?')
-	} else if (com == 'Invite All') {
-		alert('Add New Item');
+        var sel = $('.trSelected', grid);
+        if(sel.length==0){
+            alert('Please select a friend.');
+            return;
+        }
+		if(confirm('Realy invite ' + sel.length + ' friends?')){
+            
+        }
+	} else if (com == 'Select All') {
+        $( grid).find('table:eq(2) tbody tr').addClass('trSelected');
+		
+	} else if (com == 'Deselect All') {
+        $( grid).find('table:eq(2) tbody tr').removeClass('trSelected');
+
 	}
 }
 
@@ -29,7 +40,8 @@ $("#promo_friends").flexigrid({
 		],
 	buttons : [
 		{name: 'Invite', bclass: 'invite', onpress : friends_table_buttons},
-		{name: 'Invite All', bclass: 'invite_all', onpress : friends_table_buttons},
+		{name: 'Select All', bclass: 'invite_all', onpress : friends_table_buttons},
+        {name: 'Deselect All', bclass: 'invite_all', onpress : friends_table_buttons},
 		{separator: true}
 		],
 	searchitems : [
@@ -49,6 +61,7 @@ $("#promo_friends").flexigrid({
         $("#promo_friends").flexOptions({params: [ 
             {name:'csrfmiddlewaretoken', value: $('#csrfmiddlewaretoken input:eq(0)').val() } 
         ]});
+        
         return true; 
     },
     

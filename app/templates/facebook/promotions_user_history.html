@@ -2,9 +2,12 @@
 
 
 {% block content %}
-	<h3>Your Promotions History</h3>
-	<form class="well form-search">
-	  <input type="text" class="input-medium search-query">
+	<ul class="breadcrumb">
+	  <li class="active">Promotions User History</li>
+	</ul>
+	<form class="well form-search" method="post">
+	  {% csrf_token %}
+	  <input type="text" class="input-medium search-query" name="search" value="{{ search }}" >
 	  <button type="submit" class="btn">Search</button>
 	</form>
 	<table class="table table-striped">
@@ -12,47 +15,65 @@
 			<th>Photo</th>
 			<th>Name</th>
 			<th>Price</th>
-			<th>Elements Group</th>
+			<th>Elements In Group</th>
 			<th>Retailer</th>
-			
+
 		</thead>
 		<tbody>
-			<tr>
-				<td>dfgh</td>
-				<td>dfgh</td>
-				<td>dfgh</td>
-				<td>dfgh</td>
-				<td>dfgh</td>
-			</tr>
-			<tr>
-				<td>dfgh</td>
-				<td>dfgh</td>
-				<td>dfgh</td>
-				<td>dfgh</td>
-				<td>dfgh</td>
-			</tr>
-			<tr>
-				<td>dfgh</td>
-				<td>dfgh</td>
-				<td>dfgh</td>
-				<td>dfgh</td>
-				<td>dfgh</td>
-			</tr>
+			{% for promotiongroup in page.object_list %}
+                {% with promotion=promotiongroup.promotion %}
+				{% with product=promotion.product %}
+				<tr>
+					<td style="cursor:pointer;" onclick="window.location='{% url promotion-detail pk=promotion.pk %}';">
+						<img src="{{ product.photo }}" width="80px" />
+
+					</td>
+					<td>
+						<a href="{% url product-detail pk=product.pk %}#promotions">{{ product.name }}</a>
+					</td>
+					<td>{{ promotion.formattedprice }}</td>
+					<td>{{ promotiongroup.users.all|length }}/{{ promotion.elements_number }}</td>
+					<td>
+						<a href="{% url retailer-detail pk=promotion.retailer.pk %}" >
+							{{ promotion.retailer.name }}
+						</a>
+					</td>
+				</tr>
+				{% endwith %}
+                {% endwith %}
+			{% endfor %}
+
 		</tbody>
 		<tfoot>
 			<tr>
 				<td colspan="5">
-					
 					<div class="pagination">
 					  <ul>
-					    <li><a href="#">Prev</a></li>
-					    <li class="active">
-					      <a href="#">1</a>
-					    </li>
-					    <li><a href="#">2</a></li>
-					    <li><a href="#">3</a></li>
-					    <li><a href="#">4</a></li>
-					    <li><a href="#">Next</a></li>
+					    {% if page.has_previous %}
+					    	<li>
+					    		<a href="{% url promotions-list  %}?page={{ page.previous_page_number }}">
+					    		Prev
+					    		</a>
+					    	</li>
+					    {% endif %}
+					    {% for p in paginator.page_range %}
+					    	{% if page_number = p %}
+					    		<li class="active">
+							      <a href="javascript:void(0);">{{ p }}</a>
+							    </li>
+					    	{% else%}
+							    <li >
+							      <a href="{% url promotions-list %}?page={{ p }}">{{ p }}</a>
+							    </li>
+					    	{% endif %}
+					    {% endfor %}
+					    {% if page.has_next %}
+					    	<li>
+					    		<a href="{% url promotions-list %}?page={{ page.next_page_number }}">
+					    		Next
+					    		</a>
+					    	</li>
+					    {% endif %}
 					  </ul>
 					</div>
 				</td>

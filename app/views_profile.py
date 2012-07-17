@@ -7,40 +7,78 @@ from forms import CustomUserGroupForm
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.forms.util import ErrorList
 from django.core.paginator import Paginator
-
+from datetime import datetime
+from django.db.models import Q
 import json
 
 @access_required
 def list_promotions(request,*kwargs):
-	
-	user = Login(request).getUser()
-	promotions = []
-	search = ''
-	if 'search' in request.POST and request.POST['search'] != '':
-		search = request.POST['search']
-		promotions = PromotionGroup.objects.filter(promotion__name_icontains = search).select_related('promotion')
-	else:
-		promotions = PromotionGroup.objects.select_related('promotion')
-	paginator = Paginator(promotions, 10)
-	try:
-		page = int(request.GET.get('page',1))
-	except:
-		page = 1
-	if page > paginator.num_pages:
-		page = paginator.num_pages
-	if page < 1:
-		page = 1
-		
-	return render(request, 'facebook/promotions_user.html', {
+    user = Login(request).getUser()
+    search = ''
+    promotions = PromotionGroup.objects.filter(
+        Q(users__in=[user]),
+        Q(win_date__exact = None),
+        Q(promotion__active=True),
+        Q( promotion__end_date__gt = datetime.now() ) |
+        Q( promotion__end_date__exact = None )
+    )
+    if 'search' in request.POST and request.POST['search'] != '':
+        search = request.POST['search']
+        promotions = promotions.filter(
+            Q(promotion__product__name__icontains = search) |
+            Q(promotion__retailer__name__icontains = search)
+        )
+
+    paginator = Paginator(promotions, 10)
+    try:
+        page = int(request.GET.get('page',1))
+    except:
+        page = 1
+    if page > paginator.num_pages:
+        page = paginator.num_pages
+    if page < 1:
+        page = 1
+    return render(request, 'facebook/promotions_user.html', {
 		'paginator': paginator,
 		'search':search,
 		'page': paginator.page(page),	
 		'page_number':page,
 	},)
-	
+
 @access_required
 def list_history_promotions(request,*kwargs):
-	return render(request, 'facebook/promotions_user_history.html', {},)
+    user = Login(request).getUser()
+    search = ''
+    promotions = PromotionGroup.objects.filter(
+        Q(users__in=[user]),
+        Q(win_date__isnull=False) |
+        Q( promotion__active = False ) |
+        Q( promotion__end_date__lt = datetime.now() ),
+    )
+    
+    if 'search' in request.POST and request.POST['search'] != '':
+        search = request.POST['search']
+        promotions = promotions.filter(
+            Q(promotion__product__name__icontains = search) |
+            Q(promotion__retailer__name__icontains = search)
+        )
+
+    paginator = Paginator(promotions, 10)
+    try:
+        page = int(request.GET.get('page',1))
+    except:
+        page = 1
+    if page > paginator.num_pages:
+        page = paginator.num_pages
+    if page < 1:
+        page = 1
+
+    return render(request, 'facebook/promotions_user_history.html', {
+        'paginator': paginator,
+		'search':search,
+		'page': paginator.page(page),
+		'page_number':page,
+    },)
 
 @access_required
 def list_friendsgroup(request,*kwargs):

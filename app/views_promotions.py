@@ -15,7 +15,8 @@ def list(request,*kwargs):
 	search = ''
 	if 'search' in request.POST and request.POST['search'] != '':
 		search = request.POST['search']
-		promotions = Promotion.objects.filter( 
+		promotions = Promotion.objects.filter(
+            Q(active=True),
 			Q(product__name__icontains = search) | Q(retailer__name__icontains = search)
 		)
 	else:
@@ -42,7 +43,7 @@ def promotion_detail(request,pk,*kwargs):
 	promotion_status = 'close'
 	try:
 		
-		promotion = Promotion.objects.get(pk=pk)
+		promotion = Promotion.objects.get(pk=pk,active=True)
 		user = Login(request).getUser()
 		promotion_status = promotion.getPromotionStatusForUser(user)
 			
@@ -132,25 +133,7 @@ def promotion_detail_groups_table_ajax(request,pk,*kwargs):
 	users = user.friends.all()
 	
 	promotions = promotion.promotionGroups.filter(users__in = users).exclude(users__in = [user])
-	""""	
-	if request.POST.get('qtype',None) is not None:
-		if request.POST.get('qtype',None) == 'name':
-			users = users.filter( name__icontains= request.POST.get('query','') )
-		elif request.POST.get('qtype',None) == 'groups':
-			users = users.filter( 
-				custom_user_friends_groups__user = user,
-				custom_user_friends_groups__name__icontains = request.POST.get('query','') 
-			)
 	
-	if request.POST.get('sortorder','') != 'asc':
-		field_order = '-'
-	if 'sortname' in request.POST:
-		if request.POST.get('sortname','') == 'name' :
-			users = users.order_by(field_order+'name')
-		
-	else:
-		users = users.order_by(field_order+'name')	
-    """
 	promotions = promotions.distinct()
 	paginator = Paginator(promotions.all(), request.POST.get('rp',15))
 	try:
@@ -216,60 +199,62 @@ def promotion_detail_friends_ajax(request,pk,*kwargs):
 
 @access_required_ajax
 def promotion_detail_friends_table_ajax(request,pk,*kwargs):
-	json = MyJson(request)
-	promotion = Promotion.objects.get(pk=pk)
-	user = Login(request).getUser()
-	field_order = ''
+    json = MyJson(request)
+    promotion = Promotion.objects.get(pk=pk)
+    user = Login(request).getUser()
+    field_order = ''
 	
-	users = user.friends.exclude(pk=user.pk)
+    users = user.friends.filter(active=True).exclude(pk=user.pk)
 	
-	if request.POST.get('qtype',None) is not None:
-		if request.POST.get('qtype',None) == 'name':
-			users = users.filter( name__icontains= request.POST.get('query','') )
-		elif request.POST.get('qtype',None) == 'groups':
-			users = users.filter( 
-				custom_user_friends_groups__user = user,
-				custom_user_friends_groups__name__icontains = request.POST.get('query','') 
-			)
-	if request.POST.get('sortorder','') != 'asc':
-		field_order = '-'
-	if 'sortname' in request.POST:
-		if request.POST.get('sortname','') == 'name' :
-			users = users.order_by(field_order+'name')
+    if request.POST.get('qtype',None) is not None:
+        if request.POST.get('qtype',None) == 'name':
+            users = users.filter( name__icontains= request.POST.get('query','') )
+        elif request.POST.get('qtype',None) == 'groups':
+            users = users.filter(
+                custom_user_friends_groups__user = user,
+                custom_user_friends_groups__name__icontains = request.POST.get('query','')
+            )
+    if request.POST.get('sortorder','') != 'asc':
+        field_order = '-'
+    if 'sortname' in request.POST:
+        if request.POST.get('sortname','') == 'name' :
+            users = users.order_by(field_order+'name')
 		
-	else:
-		users = users.order_by(field_order+'name')	
-	print dir(user)
-	users = users.all()
-	paginator = Paginator(users.all(), request.POST.get('rp',15))
-	try:
-		page = int(request.POST.get('page',1))
-	except:
-		page = 1
-		
-	if page > paginator.num_pages:
-		page = paginator.num_pages
-	if page < 1:
-		page = 1
-	rows = paginator.page(page)
-	data = {
-		'page': page,
-		'total':users.count(),
-		'rows':[],
-	}
+    else:
+        users = users.order_by(field_order+'name')
+    users = users.all()
+
+    print dir(user)
+
+    paginator = Paginator(users.all(), request.POST.get('rp',15))
+    try:
+        page = int(request.POST.get('page',1))
+    except:
+        page = 1
+
+    if page > paginator.num_pages:
+        page = paginator.num_pages
+    if page < 1:
+        page = 1
+    rows = paginator.page(page)
+    data = {
+        'page': page,
+        'total':users.count(),
+        'rows':[],
+    }
 	
-	for o in rows:
-		data['rows'].append({
-			'id': o.pk,
-			'cell':{
-				'photo':o.getTablePhoto(),
-				'name':o.name,
-				'groups':o.getGroupsNamesByUser(user) ,
-				'idInvited': 'Yes' if o.isInvited(user,promotion) else 'No',
-			},
+    for o in rows:
+        data['rows'].append({
+            'id': o.pk,
+            'cell':{
+                'photo':o.getTablePhoto(),
+                'name':o.name,
+                'groups':o.getGroupsNamesByUser(user) ,
+                'idInvited': 'Yes' if o.isInvited(user,promotion) else 'No',
+            },
 			
-		})
-	return json.transformeJsonRequest(data)
+        })
+    return json.transformeJsonRequest(data)
 	
 	
 

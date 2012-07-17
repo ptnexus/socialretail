@@ -26,30 +26,31 @@ class CustomUserManager(models.Manager):
 
 
 class CustomUser(models.Model):
-	username = models.CharField('username',max_length=80,null=False,blank=False,unique=True)
-	password = models.CharField('password',max_length=80,null=False,blank=False)
-	email = models.EmailField('email',null=False,blank=False,unique=True)
-	facebookid = models.IntegerField('facebookid',null=True,unique=True,blank=True)
-	name = models.CharField('name',max_length=80,null=False,blank=False)
-	birth_date = models.DateField(u'birth date',null=False)
-	join_date = models.DateTimeField(u'join date',auto_now_add=True,null=False)
-	left_date = models.DateTimeField(u'left date',null=True,blank=True)
-	active = models.BooleanField('active',default=True)
-	friends = models.ManyToManyField('CustomUser',related_name='CustomUserFriends',blank=True)
-	photo = models.URLField('photo',null=True,blank=True)
-	def __unicode__(self):
-		return self.name
-	def getTable(self):
-		return "<tr><td>"+self.name+"</td><td>"+self.email+"</td></tr>"
+    username = models.CharField('username',max_length=80,null=False,blank=False,unique=True)
+    password = models.CharField('password',max_length=80,null=False,blank=False)
+    email = models.EmailField('email',null=False,blank=False,unique=True)
+    facebookid = models.IntegerField('facebookid',null=True,unique=True,blank=True)
+    name = models.CharField('name',max_length=80,null=False,blank=False)
+    birth_date = models.DateField(u'birth date',null=False)
+    join_date = models.DateTimeField(u'join date',auto_now_add=True,null=False)
+    left_date = models.DateTimeField(u'left date',null=True,blank=True)
+    active = models.BooleanField('active',default=True)
+    friends = models.ManyToManyField('CustomUser',related_name='CustomUserFriends',blank=True)
+    photo = models.URLField('photo',null=True,blank=True)
+    def __unicode__(self):
+        return self.name
+    def getTable(self):
+        return "<tr><td>"+self.name+"</td><td>"+self.email+"</td></tr>"
 	
-	def getTablePhoto(self):
-		return '<img src="'+self.photo+'" height="20px"" />' if self.photo else ''
+    def getTablePhoto(self):
+        return '<img src="'+self.photo+'" height="20px"" />' if self.photo else ''
 		
-	def isInvited(self,user,promotion):
-		return True
+    def isInvited(self,user,promotion):
+        #print self.invite_user_to.filter(user__in=[user])
+        return True
 		
-	def getGroupsNamesByUser(self,user):
-		return ','.join( self.custom_user_friends_groups.filter(user=user).order_by('name').values_list('name', flat=True) )
+    def getGroupsNamesByUser(self,user):
+        return ','.join( self.custom_user_friends_groups.filter(user=user).order_by('name').values_list('name', flat=True) )
 
 class Messages(models.Model):
 	user_from = models.ForeignKey(CustomUser,related_name='user_from',null=False)
@@ -116,7 +117,7 @@ class Promotion(models.Model):
 	def formattedprice(self):
 		return "€%01.2f" % self.price
 	def userInPromotion(self,myuser):
-		for p in PromotionGroup.objects.filter(promotion=self,active=True).prefetch_related('users'):
+		for p in PromotionGroup.objects.filter(promotion=self,).prefetch_related('users'):
 			if p.users.filter(user=myuser,).count() > 0:
 				return True
 		return False
@@ -152,7 +153,7 @@ class PromotionGroup(models.Model):
 	win_date = models.DateTimeField(u'win date',null=True,blank=True)
 	#users = models.ManyToManyField(CustomUser,through='UserGroupPromotion')
 	users = models.ManyToManyField(CustomUser,related_name='promotion_group_users')
-	active = models.BooleanField('active',default=True)
+	#active = models.BooleanField('active',default=True)
 	class Meta:
 		unique_together = ( ('user','promotion'),)
 		
