@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from app.models import CustomUser,CustomUserGroup,WishList
+from app.models import Promotion
 from django import forms
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 
-
+"""
 class LoginForm(forms.Form):
     username = forms.CharField(label='Username',max_length=100, widget=forms.TextInput(
     	attrs = { 'class':"input-medium", 'placeholder':"Username" }
@@ -42,10 +42,10 @@ class WishListProductForm(forms.ModelForm):
 	class Meta:
 		model = WishList
 		exclude = ('remove_date','user','products')
-		
-class WishListForm(forms.ModelForm):
+"""		
+class PromotionForm(forms.ModelForm):
 	def __init__(self, *args, **kwargs):
-	    super (WishListForm, self).__init__(*args, **kwargs)
+	    super (PromotionForm, self).__init__(*args, **kwargs)
 	    self.fields['products'].widget.attrs['class'] = "multiselect"
 	    self.fields['products'].widget.attrs['style'] = "width:440px;height:250px;"
 	    
@@ -57,5 +57,5 @@ class WishListForm(forms.ModelForm):
 		except ValidationError, e:
 			self._update_errors(e.message_dict)
 	class Meta:
-		model = WishList
-		exclude = ('remove_date','user',)
+		model = Promotion
+		exclude = ('retailer')

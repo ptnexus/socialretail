@@ -13,28 +13,33 @@
 	
 	<table class="table table-striped">
 		<thead>
-			<th>url</th>
-			<th>Date</th>l
+			<th>Photo</th>
+			<th>Name</th>
+			<th>Max Groups</th>
+			<th>End Date</th>
 			<th>Price</th>
 		</thead>
 		<tbody>
 			{% for promotion in page.object_list %}
 			<tr>
 				<td>
-					<!--<img src="{{ promotion.url }}" width="80px" />-->
-					{{ promotion.product.photo }}
+					<img src="{{ promotion.product.photo }}" width="80px" />
  				</td>
 				<td>
-					<!--<a href="javascript:void(0);" rel="popover" 
-						title="{{ product.name }}" 
-						data-content="{{ product.resume }}"
+					<a href="javascript:void(0);" rel="popover" 
+						title="{{ promotion.product.name }}" 
+						data-content="{{ promotion.product.resume }}"
 					>
-						{{ product.name }}
-					</a>-->
-					{{ promotion.start_date }}
+						{{ promotion.product.name }}
+					</a>
 				</td>
-				<!--<td>{{ product.formattedprice }}</td>-->
-				<td>{{ promotion.price }}</td>
+				<td>
+					{{ promotion.groups_max_number }}
+				</td>
+				<td>
+					{{ promotion.end_date }}
+				</td>
+				<td><del>{{ promotion.product.formattedprice }}</del> / {{ promotion.formattedprice }}</td>
 			</tr>
 			{% endfor %}
 		</tbody>
